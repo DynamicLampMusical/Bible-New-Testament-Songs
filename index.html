@@ -3219,7 +3219,8 @@
 
         // Update rectangle highlight based on current audio
         function updateRectangleFromAudio() {
-            const currentSrc = parentAudio.src || '';
+            const audioPlayer = document.getElementById('parent-audio-player');
+            const currentSrc = audioPlayer ? audioPlayer.src : '';
             if (!currentSrc.includes('music/')) return;
 
             // Extract chapter name from audio file path
@@ -3324,11 +3325,6 @@
                         // Navigate using the main page's navigation
                         const chapterName = href.replace('.html', '').replace('index.html?chapter=', '');
 
-                        // Check if this chapter's song is already playing
-                        const audioPlayer = document.getElementById('parent-audio-player');
-                        const currentSrc = audioPlayer ? audioPlayer.src : '';
-                        const isThisSongPlaying = audioPlayer && currentSrc.includes(chapterName) && !audioPlayer.paused;
-
                         // Use the same navigation as sidebar links
                         if (href.startsWith('index.html?chapter=')) {
                             window.history.pushState({}, '', href);
@@ -3341,15 +3337,13 @@
                         mainContent.style.display = 'none';
                         document.body.classList.add('chapter-view');
 
-                        // Only auto-play if this song is NOT already playing
-                        if (!isThisSongPlaying) {
-                            // Mark this rectangle as playing
-                            markRectanglePlaying(chapterName);
-                            // Set flag to auto-play when iframe loads
-                            window.pendingAutoPlay = true;
-                        }
+                        // Mark this rectangle as playing immediately
+                        markRectanglePlaying(chapterName);
 
-                        // Always load the chapter page
+                        // Set flag to auto-play when iframe loads
+                        window.pendingAutoPlay = true;
+
+                        // Load the chapter page
                         chapterIframe.src = chapterName + '.html';
                     };
 
@@ -3817,17 +3811,15 @@
                 // Wait a moment for the iframe to fully initialize
                 setTimeout(() => {
                     try {
-                        const iframeDoc = this.contentDocument || this.contentWindow.document;
-                        // Find the "Listen Now (Common Melody)" button - it's the first .listen-btn
-                        const audioButtons = iframeDoc.querySelectorAll('.listen-btn');
-                        if (audioButtons.length > 0) {
-                            // Click the first button (Common Melody)
-                            audioButtons[0].click();
+                        const iframeWin = this.contentWindow;
+                        // Directly call the playAudio function in the iframe
+                        if (iframeWin && typeof iframeWin.playAudio === 'function') {
+                            iframeWin.playAudio(0); // 0 = Common Melody (first button)
                         }
                     } catch (e) {
                         console.log('Auto-play trigger failed:', e);
                     }
-                }, 500);
+                }, 800);
             }
         });
 
