@@ -3191,10 +3191,17 @@
                 } else {
                     // Restore normal scroll when closing
                     document.body.style.overflow = '';
-                    // If a chapter was loaded while overlay was open, ensure it's visible
+                    // If a chapter was loaded while overlay was open, ensure correct display
                     const chapterFrame = document.getElementById('chapterFrame');
-                    if (document.body.classList.contains('chapter-view') && chapterFrame) {
-                        chapterFrame.style.display = 'block';
+                    const mainContent = document.getElementById('mainContent');
+                    if (document.body.classList.contains('chapter-view')) {
+                        // In chapter view: show chapter, hide main
+                        if (chapterFrame) chapterFrame.style.display = 'block';
+                        if (mainContent) mainContent.style.display = 'none';
+                    } else {
+                        // In main view: show main, hide chapter
+                        if (chapterFrame) chapterFrame.style.display = 'none';
+                        if (mainContent) mainContent.style.display = 'block';
                     }
                 }
             }
@@ -3811,18 +3818,40 @@
         document.getElementById('chapterIframe').addEventListener('load', function() {
             if (window.pendingAutoPlay) {
                 window.pendingAutoPlay = false;
-                // Wait a moment for the iframe to fully initialize
-                setTimeout(() => {
-                    try {
-                        const iframeWin = this.contentWindow;
-                        // Directly call the playAudio function in the iframe
-                        if (iframeWin && typeof iframeWin.playAudio === 'function') {
-                            iframeWin.playAudio(0); // 0 = Common Melody (first button)
+                const iframe = this;
+
+                // Try multiple times with increasing delays to ensure iframe is ready
+                const tryAutoPlay = (attempt) => {
+                    if (attempt > 3) return; // Give up after 3 attempts
+
+                    setTimeout(() => {
+                        try {
+                            const iframeWin = iframe.contentWindow;
+                            const iframeDoc = iframe.contentDocument || iframeWin.document;
+
+                            // Method 1: Try calling playAudio directly
+                            if (iframeWin && typeof iframeWin.playAudio === 'function') {
+                                iframeWin.playAudio(0);
+                                return;
+                            }
+
+                            // Method 2: Try clicking the button
+                            const listenBtn = iframeDoc.querySelector('.listen-btn');
+                            if (listenBtn) {
+                                listenBtn.click();
+                                return;
+                            }
+
+                            // Method 3: Try again with more delay
+                            tryAutoPlay(attempt + 1);
+                        } catch (e) {
+                            console.log('Auto-play attempt ' + attempt + ' failed:', e);
+                            tryAutoPlay(attempt + 1);
                         }
-                    } catch (e) {
-                        console.log('Auto-play trigger failed:', e);
-                    }
-                }, 800);
+                    }, attempt * 500 + 300); // 300ms, 800ms, 1300ms
+                };
+
+                tryAutoPlay(1);
             }
         });
 
