@@ -790,6 +790,10 @@
         body.chapter-view {
             overflow: auto;
         }
+        body.chapter-view .hamburger,
+        body.chapter-view .music-page-btn {
+            display: none;
+        }
         @media (max-width: 768px) {
             .chapter-frame {
                 padding-top: 60px;
@@ -3801,8 +3805,8 @@
                 setTimeout(() => {
                     try {
                         const iframeDoc = this.contentDocument || this.contentWindow.document;
-                        // Find the "Listen Now (Common Melody)" button - it's usually index 0
-                        const audioButtons = iframeDoc.querySelectorAll('.audio-btn');
+                        // Find the "Listen Now (Common Melody)" button - it's the first .listen-btn
+                        const audioButtons = iframeDoc.querySelectorAll('.listen-btn');
                         if (audioButtons.length > 0) {
                             // Click the first button (Common Melody)
                             audioButtons[0].click();
