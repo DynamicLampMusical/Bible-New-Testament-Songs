@@ -790,10 +790,6 @@
         body.chapter-view {
             overflow: auto;
         }
-        body.chapter-view .hamburger,
-        body.chapter-view .music-page-btn {
-            display: none;
-        }
         @media (max-width: 768px) {
             .chapter-frame {
                 padding-top: 60px;
@@ -3305,12 +3301,33 @@
 
                     rect.onclick = (e) => {
                         e.preventDefault();
+
+                        // Check if this is the Introduction link (href = "index.html")
+                        const isIntro = href === 'index.html';
+
+                        const chapterFrame = document.getElementById('chapterFrame');
+                        const chapterIframe = document.getElementById('chapterIframe');
+                        const mainContent = document.getElementById('mainContent');
+
+                        if (isIntro) {
+                            // Introduction: show main content, hide chapter frame
+                            chapterFrame.style.display = 'none';
+                            chapterIframe.src = 'about:blank';
+                            mainContent.style.display = 'block';
+                            document.body.classList.remove('chapter-view');
+                            window.history.pushState({}, '', 'index.html');
+                            // Close music overlay
+                            toggleMusicPage();
+                            return;
+                        }
+
                         // Navigate using the main page's navigation
                         const chapterName = href.replace('.html', '').replace('index.html?chapter=', '');
 
                         // Check if this chapter's song is already playing
-                        const currentSrc = parentAudio.src || '';
-                        const isThisSongPlaying = currentSrc.includes(chapterName) && !parentAudio.paused;
+                        const audioPlayer = document.getElementById('parent-audio-player');
+                        const currentSrc = audioPlayer ? audioPlayer.src : '';
+                        const isThisSongPlaying = audioPlayer && currentSrc.includes(chapterName) && !audioPlayer.paused;
 
                         // Use the same navigation as sidebar links
                         if (href.startsWith('index.html?chapter=')) {
@@ -3320,10 +3337,6 @@
                         }
 
                         // Load the chapter (but keep music page open)
-                        const chapterFrame = document.getElementById('chapterFrame');
-                        const chapterIframe = document.getElementById('chapterIframe');
-                        const mainContent = document.getElementById('mainContent');
-
                         chapterFrame.style.display = 'block';
                         mainContent.style.display = 'none';
                         document.body.classList.add('chapter-view');
