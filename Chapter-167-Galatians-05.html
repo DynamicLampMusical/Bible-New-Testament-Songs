@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galatians 5 - Freedom in the Spirit</title>
+    <style>
+        html { overscroll-behavior: none; height: 100%; }
+        body { font-family: 'Georgia', serif; max-width: 800px; margin: 0 auto; padding: 20px; padding-bottom: calc(180px + env(safe-area-inset-bottom, 40px)); overscroll-behavior-y: none; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; -webkit-overflow-scrolling: touch; }
+        .song-container { background: linear-gradient(145deg, #ffffff 0%, #f0f0f0 100%); padding: 30px; padding-bottom: 50px; border-radius: 15px; box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+        h1 { color: #2c3e50; text-align: center; border-bottom: 3px solid #8b0000; padding-bottom: 15px; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #666; font-style: italic; margin-bottom: 20px; }
+        h2 { color: #8b0000; margin-top: 25px; font-size: 1.1em; }
+        .verse { background: #f8f9fa; padding: 15px; border-left: 4px solid #8b0000; margin: 15px 0; line-height: 1.8; }
+        .chorus { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin: 20px 0; font-style: italic; text-align: center; line-height: 2; }
+        .bridge { background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 15px 0; line-height: 1.8; }
+        .finale { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #d4af37; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center; line-height: 2; font-style: italic; }
+        .scripture-ref { text-align: center; color: #8b0000; font-size: 0.95em; margin-bottom: 10px; font-weight: bold; }
+        .duration { text-align: center; color: #6c757d; font-size: 0.9em; margin-bottom: 20px; }
+        a.back-link { display: inline-block; margin-bottom: 20px; color: #8b0000; text-decoration: none; font-weight: bold; }
+        a.back-link:hover { text-decoration: underline; }
+        .copy-btn { display: block; margin: 20px auto; padding: 12px 30px; background: linear-gradient(135deg, #8b0000 0%, #cc0000 100%); color: white; border: none; border-radius: 25px; cursor: pointer; font-size: 1em; font-weight: bold; transition: transform 0.2s, box-shadow 0.2s; }
+        .copy-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(139,0,0,0.4); }
+        .copy-btn:active { transform: translateY(0); }
+        .copied { background: linear-gradient(135deg, #28a745 0%, #34ce57 100%); }
+        .suno-format { display: none; }
+        .carousel-item { display: none; }
+        .carousel-item.active { display: block; }
+        .intro { background: linear-gradient(135deg, #2d5016 0%, #4a7c23 100%); color: white; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center; line-height: 2; }
+
+        .listen-btn { display: inline-flex; align-items: center; gap: 8px; margin: 15px auto; padding: 14px 28px; background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8c 100%); color: white; border: none; border-radius: 30px; cursor: pointer; font-size: 1em; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(30,58,95,0.3); }
+        .listen-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(30,58,95,0.4); background: linear-gradient(135deg, #2d5a8c 0%, #3d6a9c 100%); }
+        .listen-btn:active { transform: translateY(0); }
+        .listen-btn svg { width: 20px; height: 20px; fill: currentColor; }
+        .listen-btn.playing { background: linear-gradient(135deg, #28a745 0%, #34ce57 100%); }
+        .listen-btn-container { text-align: center; margin: 20px 0; }
+        #audio-toast { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 9999; font-size: 0.9em; text-align: center; max-width: 90%; }
+        #audio-player { display: none; }
+    
+        /* Persistent Audio Control Bar */
+        #audio-control-bar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6f 100%);
+            padding: 10px 15px;
+            padding-bottom: calc(15px + env(safe-area-inset-bottom, 10px));
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+            z-index: 10000;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        #audio-control-bar.visible { display: block; }
+        .acb-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .acb-top-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .acb-song-title {
+            flex: 1;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #c9a227;
+            font-weight: 600;
+        }
+        .acb-time {
+            font-size: 12px;
+            color: #aaa;
+            min-width: 90px;
+            text-align: right;
+        }
+        .acb-bottom-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .acb-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+        .acb-btn:hover { background: rgba(255,255,255,0.25); }
+        .acb-btn svg { width: 18px; height: 18px; fill: currentColor; }
+        .acb-btn.play-pause { background: #c9a227; width: 42px; height: 42px; }
+        .acb-btn.play-pause:hover { background: #d4b534; }
+        .acb-btn.play-pause svg { width: 22px; height: 22px; }
+        .acb-skip-text { font-size: 10px; font-weight: bold; }
+        .acb-seek {
+            flex: 1;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .acb-seek::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: #c9a227;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .acb-seek::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            background: #c9a227;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="song-container">
+        <div id="top-videos-container" class="video-container" style="text-align: center; margin-bottom: 20px;">
+            <div id="top-videos" style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                <iframe id="chapter-video-1" width="48%" height="200" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="max-width: 380px; border-radius: 10px;"></iframe>
+                <iframe id="chapter-video-2" width="48%" height="200" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="max-width: 380px; border-radius: 10px;"></iframe>
+            </div>
+        </div>
+
+        <script>
+        (function() {
+            const chapterName = window.location.pathname.split('/').pop().replace('.html', '');
+            fetch('setup/videolinks.json?t=' + Date.now())
+                .then(response => response.json())
+                .then(data => {
+                    const videoIds = (data[chapterName] || '9jo51nJrO0k').split(' ');
+                    // Top 2 videos
+                    document.getElementById('chapter-video-1').src = 'https://www.youtube.com/embed/' + (videoIds[0] || '9jo51nJrO0k');
+                    document.getElementById('chapter-video-2').src = 'https://www.youtube.com/embed/' + (videoIds[1] || videoIds[0] || '9jo51nJrO0k');
+                    // Bottom carousel
+                    const carousel = document.getElementById('video-carousel');
+                    if (carousel) {
+                        carousel.innerHTML = videoIds.map((id, i) =>
+                            '<div class="carousel-item' + (i === 0 ? ' active' : '') + '">' +
+                            '<iframe width="100%" height="200" src="https://www.youtube.com/embed/' + id + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 10px;"></iframe>' +
+                            '</div>'
+                        ).join('');
+                        // Update video count
+                        document.getElementById('video-count').textContent = '1 / ' + videoIds.length;
+                        // Initialize carousel display
+                        document.addEventListener('DOMContentLoaded', () => { if (typeof showSlide === 'function') showSlide(0); });
+                        if (document.readyState === 'complete') { setTimeout(() => { if (typeof showSlide === 'function') showSlide(0); }, 100); }
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('chapter-video-1').src = 'https://www.youtube.com/embed/9jo51nJrO0k';
+                    document.getElementById('chapter-video-2').src = 'https://www.youtube.com/embed/9jo51nJrO0k';
+                    // Fallback carousel with 2 videos
+                    const carousel = document.getElementById('video-carousel');
+                    if (carousel) {
+                        carousel.innerHTML = '<div class="carousel-item active"><iframe width="100%" height="200" src="https://www.youtube.com/embed/9jo51nJrO0k" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 10px;"></iframe></div><div class="carousel-item"><iframe width="100%" height="200" src="https://www.youtube.com/embed/Hfm94aHAbYQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 10px;"></iframe></div>';
+                        document.getElementById('video-count').textContent = '1 / 2';
+                    }
+                });        })();
+        </script>
+
+        <!-- Load setup configuration -->
+        <script>
+        (function() {
+            fetch('setup/setup.json?t=' + Date.now())
+                .then(response => response.json())
+                .then(config => {
+                    // SHOW_VIDEO_LINKS_ON_TOP: if false, hide top videos (default: true)
+                    if (config.SHOW_VIDEO_LINKS_ON_TOP === false) {
+                        const topVideos = document.getElementById('top-videos-container');
+                        if (topVideos) topVideos.style.display = 'none';
+                    }
+                    // SHOW_AUDIO_LINKS: if false, hide audio buttons (default: true)
+                    if (config.SHOW_AUDIO_LINKS === false) {
+                        const audioContainer = document.querySelector('.listen-btn-container');
+                        if (audioContainer) audioContainer.style.display = 'none';
+                    }
+                })
+                .catch(() => {
+                    // If config fetch fails, show everything (default behavior)
+                });
+        })();
+        </script>
+
+        <h1>Freedom in the Spirit</h1>
+        <p class="subtitle">Galatians Chapter 5</p>
+        <p class="scripture-ref">Scripture: Galatians 5</p>
+        <p class="duration">Duration: ~2 minutes | Style: Devotional Ballad</p>
+
+        <div class="listen-btn-container">
+            <button class="listen-btn" id="listen-btn-1" onclick="playAudio(0)">
+                <svg viewBox="0 0 24 24" id="play-icon-1"><path d="M8 5v14l11-7z"/></svg>
+                <span id="listen-text-1">Listen Now (Common Melody)</span>
+            </button>
+            <button class="listen-btn" id="listen-btn-2" onclick="playAudio(1)">
+                <svg viewBox="0 0 24 24" id="play-icon-2"><path d="M8 5v14l11-7z"/></svg>
+                <span id="listen-text-2">Listen Now (Unique Melody)</span>
+            </button>
+            <audio id="audio-player"></audio>
+        </div>
+        <div id="audio-toast">We will make this audio available soon</div>
+                <script>
+        // Audio Controller - delegates playback to parent window for persistence
+        const isInIframe = window.parent !== window;
+        let currentPlayingIndex = -1;
+        let currentAudioPath = '';
+        let isCurrentlyPlaying = false;
+
+        const buttons = [
+            { btn: document.getElementById('listen-btn-1'), icon: document.getElementById('play-icon-1'), text: document.getElementById('listen-text-1'), label: 'Listen Now (Common Melody)' },
+            { btn: document.getElementById('listen-btn-2'), icon: document.getElementById('play-icon-2'), text: document.getElementById('listen-text-2'), label: 'Listen Now (Unique Melody)' }
+        ];
+
+        function getChapterName() {
+            return window.location.pathname.split('/').pop().replace('.html', '');
+        }
+
+        function showAudioToast(message) {
+            const toast = document.getElementById('audio-toast');
+            if (toast) {
+                toast.textContent = message || 'We will make this audio available soon';
+                toast.style.display = 'block';
+                setTimeout(() => { toast.style.display = 'none'; }, 3000);
+            }
+        }
+
+        function resetAllButtons() {
+            buttons.forEach((b, i) => {
+                if (b.btn) {
+                    b.btn.classList.remove('playing');
+                    b.icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+                    b.text.textContent = b.label;
+                }
+            });
+        }
+
+        function setButtonPlaying(index, isPlaying) {
+            if (index < 0 || !buttons[index] || !buttons[index].btn) return;
+            if (isPlaying) {
+                buttons[index].btn.classList.add('playing');
+                buttons[index].icon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+                buttons[index].text.textContent = buttons[index].label.replace('Listen Now', 'Pause Now');
+            } else {
+                buttons[index].btn.classList.remove('playing');
+                buttons[index].icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+                buttons[index].text.textContent = buttons[index].label;
+            }
+        }
+
+        async function playAudio(index) {
+            // If same button clicked, toggle play/pause
+            if (currentPlayingIndex === index) {
+                if (isInIframe) {
+                    window.parent.postMessage({ type: 'toggleAudio' }, '*');
+                }
+                return;
+            }
+
+            const chapterName = getChapterName();
+            const melodyType = index === 0 ? 'Common' : 'Unique';
+            const title = chapterName.replace(/-/g, ' ') + ' (' + melodyType + ')';
+
+            try {
+                const response = await fetch('setup/audiolinks.json?t=' + Date.now());
+                const audiolinks = await response.json();
+                const audioFiles = audiolinks[chapterName];
+
+                if (audioFiles && audioFiles !== 'sample-audio-file.wav sample-audio-file.wav') {
+                    const files = audioFiles.split(' ');
+                    const audioFile = files[index] || files[0];
+
+                    if (audioFile && audioFile !== 'sample-audio-file.wav') {
+                        const audioPath = 'music/' + audioFile;
+
+                        // Check if file exists
+                        const checkResponse = await fetch(audioPath, { method: 'HEAD' });
+                        if (checkResponse.ok) {
+                            // Reset all buttons first
+                            resetAllButtons();
+
+                            if (isInIframe) {
+                                // Send play request to parent
+                                window.parent.postMessage({
+                                    type: 'playAudio',
+                                    audioPath: audioPath,
+                                    title: title,
+                                    chapterName: chapterName,
+                                    melodyIndex: index
+                                }, '*');
+                            }
+
+                            // Update button state
+                            currentPlayingIndex = index;
+                            currentAudioPath = audioPath;
+                            isCurrentlyPlaying = true;
+                            setButtonPlaying(index, true);
+                            return;
+                        }
+                    }
+                }
+                showAudioToast();
+            } catch (e) {
+                showAudioToast();
+            }
+        }
+
+        // Listen for messages from parent
+        window.addEventListener('message', (event) => {
+            const data = event.data;
+            if (!data || !data.type) return;
+
+            switch (data.type) {
+                case 'parentAudioState':
+                    // Parent is telling us current audio state
+                    if (data.audioPath && data.audioPath.includes(getChapterName())) {
+                        // This chapter's audio is playing/paused
+                        // Determine which button based on audio path
+                        if (data.isPlaying) {
+                            // Find which button matches
+                            if (currentPlayingIndex >= 0) {
+                                setButtonPlaying(currentPlayingIndex, true);
+                            }
+                        }
+                    }
+                    break;
+
+                case 'parentAudioStateChanged':
+                    // Parent audio play/pause state changed
+                    isCurrentlyPlaying = data.isPlaying;
+                    if (currentPlayingIndex >= 0) {
+                        setButtonPlaying(currentPlayingIndex, data.isPlaying);
+                    }
+                    break;
+
+                case 'parentAudioStopped':
+                    // Parent stopped audio
+                    resetAllButtons();
+                    currentPlayingIndex = -1;
+                    currentAudioPath = '';
+                    isCurrentlyPlaying = false;
+                    break;
+
+                case 'parentAudioEnded':
+                    // Audio finished playing
+                    resetAllButtons();
+                    currentPlayingIndex = -1;
+                    isCurrentlyPlaying = false;
+                    break;
+            }
+        });
+
+        // On page load, query parent for current audio state
+        document.addEventListener('DOMContentLoaded', () => {
+            if (isInIframe) {
+                // Small delay to ensure parent is ready
+                setTimeout(() => {
+                    window.parent.postMessage({ type: 'getAudioState' }, '*');
+                }, 100);
+            }
+        });
+        </script>
+
+
+
+
+
+        <h2>[Intro]</h2>
+        <div class="intro">
+Fruits are ripened through sacred Word,<br>
+Galatians, chapter five is heard,<br>
+As sons and heirs we hold our place,<br>
+Now freedom comes through Spirit's grace,<br>
+The fruit of love fills every space.
+        </div>
+
+        <h2>[Verse 1]</h2>
+        <div class="verse">
+For freedom Christ has set us free,<br>
+Stand firm, reject all slavery,<br>
+The whole law summed in love's command,<br>
+Love your neighbor, take their hand,<br>
+Walk by the Spirit every day,<br>
+And the flesh will have no sway.
+        </div>
+
+        <h2>[Chorus]</h2>
+        <div class="chorus">
+The Spirit's fruit is love and joy,<br>
+Peace and patience none destroy,<br>
+Kindness, goodness, faithful, true,<br>
+Gentleness and life made new.
+        </div>
+
+        <h2>[Verse 2]</h2>
+        <div class="verse">
+The flesh and Spirit wage their war,<br>
+Desires conflict to the core,<br>
+But those belonging to the King,<br>
+Have crucified their wandering,<br>
+If by the Spirit now we live,<br>
+By the Spirit let us give.
+        </div>
+
+        <h2>[Chorus]</h2>
+        <div class="chorus">
+The Spirit's fruit is love and joy,<br>
+Peace and patience none destroy,<br>
+Kindness, goodness, faithful, true,<br>
+Gentleness and life made new.
+        </div>
+
+        <h2>[Bridge]</h2>
+        <div class="bridge">
+Don't use your freedom for the flesh,<br>
+Through love serve others, blessed and fresh,<br>
+Against such fruit there is no law,<br>
+In Christ alone now stand in awe.
+        </div>
+
+        <h2>[Outro]</h2>
+        <div class="finale">
+When fearful thoughts are intertwined,<br>
+You calm the storm inside my mind.<br>
+Lord, though I cannot see Your hand,<br>
+I trust Your heart and all You've planned.
+        </div>
+
+        <h2>[Chorus]</h2>
+        <div class="chorus">
+Amen.
+        </div>
+
+        <h2>[Pause]</h2>
+        <div class="narration" style="background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%); color: #f0e6d3; padding: 20px; border-radius: 10px; margin: 20px 0; font-style: italic; text-align: center; line-height: 2;">
+[Spoken Word, Deep Male Baritone, Calm, Reverent]<br>
+Darkness abates, vanquished instantly;<br>
+Divine Light eternally embraces all now;<br>
+Drawing many into lasting, inner, nurturing, divine peace;<br>
+Always transforming, inspiring, lifting, mending, uniting, saving, illuminating, comforting, and liberating.
+        </div>
+
+        
+        <button class="copy-btn" onclick="copySunoFormat()">Copy Lyrics</button>
+        <div style="text-align: center;"><button class="copy-btn" onclick="getSheetMusic()" style="background: linear-gradient(135deg, #6b5b95 0%, #8b7cb5 100%);">Get Sheet Music</button></div>
+
+        <span id="suno-tags" style="display:none;">(Dramatic Orchestral, Cinematic, Majestic, Church Choir Organ, Dramatic Music, Church Bells, Easy to sing along, Clear pronunciation, Devotional Ballad, Emotional, Orchestral, Reverent)</span>
+
+        <script>
+        function copySunoFormat() {
+            let text = document.getElementById('suno-tags').textContent + '\n\n';
+            const sections = document.querySelectorAll('.song-container h2');
+            sections.forEach(h2 => {
+                const sectionName = h2.textContent.trim();
+                // Only process song sections (starting with [)
+                if (!sectionName.startsWith('[')) return;
+                
+                const nextEl = h2.nextElementSibling;
+                if (nextEl) {
+                    text += sectionName + '\n';
+                    let html = nextEl.innerHTML;
+                    html = html.replace(/<br\s*\/?>/gi, '\n');
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    let content = temp.textContent.trim();
+                    content = content.replace(/\n\s*\n/g, '\n');
+                    text += content + '\n\n';
+                }
+            });
+            navigator.clipboard.writeText(text.trim()).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy Lyrics';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        function getSheetMusic() {
+            showAudioToast('Sheet music functionality is not yet available');
+        }
+    </script>
+
+        <!-- Video Carousel -->
+        <div class="video-carousel-section" style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #ddd;">
+            <h2 style="text-align: center; color: #2c3e50; margin-bottom: 15px;">Videos</h2>
+            <div id="carousel-wrapper" style="position: relative; max-width: 500px; margin: 0 auto;">
+                <div id="carousel-controls" style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 15px;">
+                    <button onclick="prevVideo()" style="background: linear-gradient(135deg, #8b0000 0%, #cc0000 100%); color: white; border: 3px solid #fff; border-radius: 50%; width: 56px; height: 56px; cursor: pointer; font-size: 28px; font-weight: bold; box-shadow: 0 4px 15px rgba(139,0,0,0.4); display: flex; align-items: center; justify-content: center;">&#10094;</button>
+                    <span id="video-count" style="font-weight: bold; color: #333; font-size: 1.1em; background: #f0f0f0; padding: 8px 16px; border-radius: 20px;">1 / 1</span>
+                    <button onclick="nextVideo()" style="background: linear-gradient(135deg, #8b0000 0%, #cc0000 100%); color: white; border: 3px solid #fff; border-radius: 50%; width: 56px; height: 56px; cursor: pointer; font-size: 28px; font-weight: bold; box-shadow: 0 4px 15px rgba(139,0,0,0.4); display: flex; align-items: center; justify-content: center;">&#10095;</button>
+                </div>
+                <div id="video-carousel" style="overflow: hidden;">
+                    <!-- Videos will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <script>
+        let currentSlide = 0;
+        function showSlide(n) {
+            const items = document.querySelectorAll('.carousel-item');
+            if (items.length === 0) return;
+            currentSlide = (n + items.length) % items.length;
+            items.forEach((item, i) => {
+                item.style.display = i === currentSlide ? 'block' : 'none';
+            });
+            document.getElementById('video-count').textContent = (currentSlide + 1) + ' / ' + items.length;
+        }
+        function nextVideo() { showSlide(currentSlide + 1); }
+        function prevVideo() { showSlide(currentSlide - 1); }
+        </script>
+
+        <!-- iOS Safari scroll spacer - inside container for proper rendering -->
+        <div style="height: 200px; width: 100%;"></div>
+        
+    </div><!-- end song-container -->
+    
+    <!-- Additional body spacer for iOS safe area -->
+    <div style="height: 150px;"></div>
+
+    <!-- Persistent Audio Control Bar -->
+    <div id="audio-control-bar">
+        <div class="acb-container">
+            <div class="acb-top-row">
+                <span class="acb-song-title" id="acb-title">No song playing</span>
+                <span class="acb-time"><span id="acb-current">0:00</span> / <span id="acb-duration">0:00</span></span>
+            </div>
+            <div class="acb-bottom-row">
+                <button class="acb-btn" onclick="acbSkip(-10)" title="Back 10s"><span class="acb-skip-text">-10</span></button>
+                <button class="acb-btn play-pause" id="acb-play-btn" onclick="acbTogglePlay()" title="Play/Pause">
+                    <svg viewBox="0 0 24 24" id="acb-play-icon"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <button class="acb-btn" onclick="acbSkip(10)" title="Forward 10s"><span class="acb-skip-text">+10</span></button>
+                <input type="range" class="acb-seek" id="acb-seek" value="0" min="0" max="100" oninput="acbSeek(this.value)">
+                <button class="acb-btn" onclick="acbStop()" title="Stop">
+                    <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
