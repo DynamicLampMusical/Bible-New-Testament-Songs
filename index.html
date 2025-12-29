@@ -671,6 +671,66 @@
             cursor: pointer;
             border: none;
         }
+
+        /* Still There Modal */
+        .still-there-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 39, 68, 0.9);
+            z-index: 20000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        .still-there-overlay.visible {
+            display: flex;
+        }
+        .still-there-modal {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6f 100%);
+            padding: 40px 50px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            max-width: 400px;
+            margin: 20px;
+            animation: modalPop 0.3s ease;
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .still-there-modal h2 {
+            color: #c9a227;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8em;
+            margin: 0 0 15px 0;
+        }
+        .still-there-modal p {
+            color: rgba(255,255,255,0.8);
+            font-size: 1.1em;
+            margin: 0 0 30px 0;
+            line-height: 1.6;
+        }
+        .still-there-btn {
+            background: linear-gradient(135deg, #c9a227 0%, #d4b534 100%);
+            color: #1e3a5f;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.2em;
+            font-weight: 700;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(201, 162, 39, 0.4);
+        }
+        .still-there-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(201, 162, 39, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -3003,12 +3063,64 @@
         </div>
     </div>
 
+    <!-- Still There Modal -->
+    <div class="still-there-overlay" id="stillThereOverlay">
+        <div class="still-there-modal">
+            <h2>Are you still there?</h2>
+            <p>Music has been playing for a while. Would you like to continue listening?</p>
+            <button class="still-there-btn" onclick="confirmStillThere()">Yes, Continue Playing</button>
+        </div>
+    </div>
+
     <script>
         // Parent Audio Controller - handles actual audio playback
         // Audio persists across iframe navigation
         const parentAudio = document.getElementById('parent-audio-player');
         let currentAudioTitle = '';
         let sortedPlaylist = []; // Sorted list of all audio files for auto-play
+
+        // Inactivity timer - "Are you still there?" after 1 hour
+        const INACTIVITY_TIMEOUT = 60 * 60 * 1000; // 1 hour in milliseconds
+        let inactivityTimer = null;
+        let lastActivityTime = Date.now();
+
+        function resetInactivityTimer() {
+            lastActivityTime = Date.now();
+            if (inactivityTimer) {
+                clearTimeout(inactivityTimer);
+            }
+            // Only set timer if audio is playing
+            if (!parentAudio.paused && parentAudio.src) {
+                inactivityTimer = setTimeout(showStillThereModal, INACTIVITY_TIMEOUT);
+            }
+        }
+
+        function showStillThereModal() {
+            // Pause the audio
+            parentAudio.pause();
+            updateControlBarUI(null, false);
+            // Show the modal
+            const overlay = document.getElementById('stillThereOverlay');
+            if (overlay) overlay.classList.add('visible');
+        }
+
+        function confirmStillThere() {
+            // Hide the modal
+            const overlay = document.getElementById('stillThereOverlay');
+            if (overlay) overlay.classList.remove('visible');
+            // Resume playback
+            parentAudio.play().then(() => {
+                updateControlBarUI(null, true);
+                saveParentAudioState();
+            }).catch(e => console.log('Resume failed:', e));
+            // Reset the timer for another hour
+            resetInactivityTimer();
+        }
+
+        // Track user activity to reset timer
+        ['click', 'touchstart', 'keydown', 'scroll'].forEach(event => {
+            document.addEventListener(event, resetInactivityTimer, { passive: true });
+        });
 
         // Load and build sorted playlist from audiolinks.json
         async function loadPlaylist() {
@@ -3178,8 +3290,18 @@
             playNextSong();
         });
 
-        parentAudio.addEventListener('play', () => saveParentAudioState());
-        parentAudio.addEventListener('pause', () => saveParentAudioState());
+        parentAudio.addEventListener('play', () => {
+            saveParentAudioState();
+            resetInactivityTimer(); // Start the 1-hour timer when playback starts
+        });
+        parentAudio.addEventListener('pause', () => {
+            saveParentAudioState();
+            // Clear timer when paused (unless modal triggered the pause)
+            if (inactivityTimer) {
+                clearTimeout(inactivityTimer);
+                inactivityTimer = null;
+            }
+        });
 
         // Listen for messages from iframe
         window.addEventListener('message', (event) => {
