@@ -3280,6 +3280,14 @@
                 grid.className = 'chapter-grid';
 
                 chapters.forEach((chapter) => {
+                    // Skip Introduction link - it shouldn't be in the music overlay
+                    const chapterHref = chapter.getAttribute('href') || '';
+                    if (chapter.classList.contains('intro-link') ||
+                        chapterHref === 'index.html' ||
+                        (!chapterHref.startsWith('Chapter-') && !chapterHref.startsWith('Spotlight-'))) {
+                        return;
+                    }
+
                     const rect = document.createElement('a');
                     rect.className = 'chapter-rect';
 
@@ -3313,12 +3321,13 @@
                     rect.onclick = (e) => {
                         e.preventDefault();
 
-                        // Check if this is the Introduction link (href = "index.html")
-                        const isIntro = href === 'index.html';
-
                         const chapterFrame = document.getElementById('chapterFrame');
                         const chapterIframe = document.getElementById('chapterIframe');
                         const mainContent = document.getElementById('mainContent');
+
+                        // Check if this is the Introduction link or any link that would load index.html
+                        const isIntro = !href || href === 'index.html' || href.startsWith('index.html?') ||
+                                        (!href.startsWith('Chapter-') && !href.startsWith('Spotlight-'));
 
                         if (isIntro) {
                             // Introduction: show main content, hide chapter frame
@@ -3332,8 +3341,8 @@
                             return;
                         }
 
-                        // Navigate using the main page's navigation
-                        const chapterName = href.replace('.html', '').replace('index.html?chapter=', '');
+                        // Navigate using the main page's navigation - extract just the filename without .html
+                        const chapterName = href.replace('.html', '');
 
                         // Use the same navigation as sidebar links
                         if (href.startsWith('index.html?chapter=')) {
@@ -3816,6 +3825,22 @@
         // Auto-play when iframe loads (triggered from music page rectangle click)
         window.pendingAutoPlay = false;
         document.getElementById('chapterIframe').addEventListener('load', function() {
+            // Safety check: prevent index.html from loading in iframe (causes duplicate icons)
+            try {
+                const iframeSrc = this.contentWindow.location.href;
+                if (iframeSrc.includes('/index.html') || iframeSrc.endsWith('/')) {
+                    // Accidentally loaded index.html - clear it
+                    this.src = 'about:blank';
+                    document.getElementById('chapterFrame').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
+                    document.body.classList.remove('chapter-view');
+                    window.pendingAutoPlay = false;
+                    return;
+                }
+            } catch (e) {
+                // Cross-origin or other error - ignore
+            }
+
             if (window.pendingAutoPlay) {
                 window.pendingAutoPlay = false;
                 const iframe = this;
