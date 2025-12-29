@@ -96,6 +96,241 @@
             transform: rotate(-45deg) translate(6px, -6px);
         }
 
+        /* Music Page Button */
+        .music-page-btn {
+            position: fixed;
+            top: 20px;
+            left: 80px;
+            z-index: 1001;
+            background: var(--bg-white);
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .music-page-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        .music-page-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--primary);
+        }
+
+        /* Music Page Overlay */
+        .music-page-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, #0f2744 0%, #1e3a5f 50%, #2d4a6f 100%);
+            z-index: 9999;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: calc(150px + env(safe-area-inset-bottom, 20px));
+        }
+        .music-page-overlay.visible {
+            display: block;
+        }
+        .music-page-close {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .music-page-close:hover {
+            background: rgba(255,255,255,0.25);
+            transform: rotate(90deg);
+        }
+        .music-page-close svg {
+            width: 24px;
+            height: 24px;
+            stroke: white;
+            stroke-width: 2;
+        }
+        .music-page-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 80px 24px 40px;
+            min-height: 100vh;
+        }
+        .music-page-title {
+            color: var(--accent);
+            font-family: 'Playfair Display', serif;
+            font-size: 2em;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .music-page-message {
+            background: rgba(255,255,255,0.1);
+            border-radius: var(--radius-md);
+            padding: 40px;
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        /* Chapter Grid Styles */
+        .chapter-sets-container {
+            padding: 10px 0;
+        }
+        .chapter-set {
+            margin-bottom: 12px;
+        }
+        .chapter-set-header {
+            background: rgba(201, 162, 39, 0.3);
+            color: var(--accent);
+            padding: 6px 12px;
+            font-weight: 600;
+            font-size: 0.75em;
+            cursor: pointer;
+            display: inline-flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            user-select: none;
+            border-radius: 4px;
+            margin-bottom: 6px;
+        }
+        .chapter-set-header:hover {
+            background: rgba(201, 162, 39, 0.5);
+        }
+        .chapter-set-header .set-arrow {
+            transition: transform 0.3s ease;
+            font-size: 0.7em;
+        }
+        .chapter-set.collapsed .set-arrow {
+            transform: rotate(-90deg);
+        }
+        .chapter-set.collapsed .chapter-grid {
+            display: none;
+        }
+        .chapter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 4px;
+        }
+        .chapter-rect {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(145deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%);
+            color: white;
+            padding: 12px 8px;
+            min-height: 70px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 6px;
+            text-decoration: none;
+        }
+        .chapter-rect:hover {
+            background: linear-gradient(145deg, rgba(201, 162, 39, 0.4) 0%, rgba(201, 162, 39, 0.25) 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border-color: rgba(201, 162, 39, 0.4);
+        }
+        .chapter-rect:active {
+            transform: translateY(0);
+        }
+        .chapter-rect .ch-num {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+        .chapter-rect .ch-title {
+            font-size: 0.7em;
+            font-weight: 400;
+            line-height: 1.3;
+            opacity: 0.9;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        /* Currently playing / checked state */
+        .chapter-rect.playing {
+            background: linear-gradient(145deg, rgba(201, 162, 39, 0.5) 0%, rgba(201, 162, 39, 0.3) 100%);
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(201, 162, 39, 0.4);
+        }
+        .chapter-rect.playing::after {
+            content: '✓';
+            position: absolute;
+            top: 4px;
+            right: 6px;
+            font-size: 0.9em;
+            color: #4ade80;
+            font-weight: bold;
+        }
+        .chapter-rect {
+            position: relative;
+        }
+        /* Spotlight sections have different color */
+        .chapter-set.spotlight .chapter-set-header {
+            background: rgba(45, 74, 111, 0.6);
+            color: var(--accent);
+        }
+        .chapter-set.spotlight .chapter-set-header:hover {
+            background: rgba(45, 74, 111, 0.8);
+        }
+        .chapter-set.spotlight .chapter-rect {
+            background: linear-gradient(145deg, rgba(201, 162, 39, 0.15) 0%, rgba(201, 162, 39, 0.08) 100%);
+            border-color: rgba(201, 162, 39, 0.15);
+        }
+        .chapter-set.spotlight .chapter-rect:hover {
+            background: linear-gradient(145deg, rgba(201, 162, 39, 0.4) 0%, rgba(201, 162, 39, 0.25) 100%);
+        }
+        @media (max-width: 600px) {
+            .chapter-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+            .chapter-rect {
+                padding: 10px 6px;
+                min-height: 60px;
+            }
+            .chapter-rect .ch-num {
+                font-size: 1em;
+            }
+            .chapter-rect .ch-title {
+                font-size: 0.65em;
+            }
+            .chapter-set-header {
+                font-size: 0.7em;
+                padding: 5px 10px;
+            }
+        }
+        @media (max-width: 400px) {
+            .chapter-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
         /* Sidebar Overlay */
         .sidebar-overlay {
             position: fixed;
@@ -589,7 +824,7 @@
             padding: 10px 15px;
             padding-bottom: calc(15px + env(safe-area-inset-bottom, 10px));
             box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
-            z-index: 10000;
+            z-index: 15000;
             color: white;
             font-family: 'Segoe UI', sans-serif;
         }
@@ -740,6 +975,28 @@
         <span></span>
         <span></span>
     </button>
+
+    <!-- Music Page Button -->
+    <button class="music-page-btn" id="musicPageBtn" aria-label="Open music page" onclick="toggleMusicPage()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+        </svg>
+    </button>
+
+    <!-- Music Page Overlay -->
+    <div class="music-page-overlay" id="musicPageOverlay">
+        <button class="music-page-close" onclick="toggleMusicPage()" aria-label="Close music page">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+        <div class="music-page-content">
+            <h1 class="music-page-title">Music Player</h1>
+            <div class="chapter-sets-container" id="chapterSetsContainer">
+                <!-- Chapter sets will be generated by JavaScript -->
+            </div>
+        </div>
+    </div>
 
     <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -2918,10 +3175,179 @@
         hamburger.addEventListener('click', toggleSidebar);
         overlay.addEventListener('click', toggleSidebar);
 
+        // Music Page Toggle
+        function toggleMusicPage() {
+            const musicOverlay = document.getElementById('musicPageOverlay');
+            if (musicOverlay) {
+                const isOpening = !musicOverlay.classList.contains('visible');
+                musicOverlay.classList.toggle('visible');
+
+                // Prevent body scroll when music page is open
+                if (isOpening) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    // Restore normal scroll when closing
+                    document.body.style.overflow = '';
+                    // If a chapter was loaded while overlay was open, ensure it's visible
+                    const chapterFrame = document.getElementById('chapterFrame');
+                    if (document.body.classList.contains('chapter-view') && chapterFrame) {
+                        chapterFrame.style.display = 'block';
+                    }
+                }
+            }
+        }
+
+        // Mark a rectangle as currently playing
+        function markRectanglePlaying(chapterName) {
+            // Remove playing class from all rectangles
+            document.querySelectorAll('.chapter-rect.playing').forEach(r => r.classList.remove('playing'));
+
+            // Find and mark the matching rectangle
+            const allRects = document.querySelectorAll('.chapter-rect');
+            allRects.forEach(rect => {
+                const href = rect.getAttribute('href') || '';
+                if (href.includes(chapterName)) {
+                    rect.classList.add('playing');
+                    // Scroll the rectangle into view if music page is open
+                    const musicOverlay = document.getElementById('musicPageOverlay');
+                    if (musicOverlay && musicOverlay.classList.contains('visible')) {
+                        rect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            });
+        }
+
+        // Update rectangle highlight based on current audio
+        function updateRectangleFromAudio() {
+            const currentSrc = parentAudio.src || '';
+            if (!currentSrc.includes('music/')) return;
+
+            // Extract chapter name from audio file path
+            // e.g., "music/Chapter-001-Matthew-01_v1-[...].mp3" -> "Chapter-001-Matthew-01"
+            const audioFile = currentSrc.split('music/').pop();
+            const chapterMatch = audioFile.match(/^(Chapter-\d+-[^_]+|Spotlight-\d+-[^_]+)/);
+            if (chapterMatch) {
+                markRectanglePlaying(chapterMatch[1]);
+            }
+        }
+
+        // Generate chapter sets grid from sidebar (single source of truth)
+        function generateChapterSets() {
+            const container = document.getElementById('chapterSetsContainer');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            // Read from sidebar - it's the source of truth
+            const sidebarBooks = document.querySelectorAll('.sidebar-book');
+
+            sidebarBooks.forEach((book) => {
+                const titleEl = book.querySelector('.sidebar-book-title');
+                const chaptersEl = book.querySelector('.sidebar-chapters');
+                if (!titleEl || !chaptersEl) return;
+
+                const chapters = chaptersEl.querySelectorAll('.sidebar-chapter-link');
+                if (chapters.length === 0) return;
+
+                // Determine if this is a spotlight section
+                const isSpotlight = titleEl.textContent.toLowerCase().includes('spotlight') ||
+                                    titleEl.textContent.toLowerCase().includes('songs');
+
+                const setDiv = document.createElement('div');
+                setDiv.className = 'chapter-set' + (isSpotlight ? ' spotlight' : '');
+
+                // Header - use the same text as sidebar
+                const headerText = titleEl.textContent.replace('▶', '').trim();
+                const header = document.createElement('div');
+                header.className = 'chapter-set-header';
+                header.innerHTML = `<span>${headerText}</span><span class="set-arrow">▼</span>`;
+                header.onclick = () => setDiv.classList.toggle('collapsed');
+                setDiv.appendChild(header);
+
+                // Grid
+                const grid = document.createElement('div');
+                grid.className = 'chapter-grid';
+
+                chapters.forEach((chapter) => {
+                    const rect = document.createElement('a');
+                    rect.className = 'chapter-rect';
+
+                    // Extract chapter number and title from text like "(001) 1. The Promised King"
+                    const chapterText = chapter.textContent.trim();
+                    const numMatch = chapterText.match(/\((\d+)\)/);
+                    const displayNum = numMatch ? parseInt(numMatch[1], 10) : '';
+
+                    // Extract title - remove the (XXX) prefix and chapter number like "1. "
+                    let title = chapterText.replace(/\(\d+\)\s*/, '').replace(/^\d+\.\s*/, '').trim();
+
+                    // Create number and title elements
+                    const numSpan = document.createElement('span');
+                    numSpan.className = 'ch-num';
+                    numSpan.textContent = displayNum;
+
+                    const titleSpan = document.createElement('span');
+                    titleSpan.className = 'ch-title';
+                    titleSpan.textContent = title;
+
+                    rect.appendChild(numSpan);
+                    rect.appendChild(titleSpan);
+
+                    // Get the href from the sidebar link
+                    const href = chapter.getAttribute('href');
+                    rect.href = href;
+
+                    // Store the full title for tooltip
+                    rect.title = chapterText;
+
+                    rect.onclick = (e) => {
+                        e.preventDefault();
+                        // Navigate using the main page's navigation
+                        const chapterName = href.replace('.html', '').replace('index.html?chapter=', '');
+
+                        // Use the same navigation as sidebar links
+                        if (href.startsWith('index.html?chapter=')) {
+                            window.history.pushState({}, '', href);
+                        } else {
+                            window.history.pushState({}, '', 'index.html?chapter=' + chapterName);
+                        }
+
+                        // Mark this rectangle as playing
+                        markRectanglePlaying(chapterName);
+
+                        // Load the chapter (but keep music page open)
+                        const chapterFrame = document.getElementById('chapterFrame');
+                        const chapterIframe = document.getElementById('chapterIframe');
+                        const mainContent = document.getElementById('mainContent');
+
+                        chapterFrame.style.display = 'block';
+                        mainContent.style.display = 'none';
+                        document.body.classList.add('chapter-view');
+
+                        // Set flag to auto-play when iframe loads
+                        window.pendingAutoPlay = true;
+                        chapterIframe.src = chapterName + '.html';
+                    };
+
+                    grid.appendChild(rect);
+                });
+
+                setDiv.appendChild(grid);
+                container.appendChild(setDiv);
+            });
+        }
+
+        // Generate chapter sets on page load
+        document.addEventListener('DOMContentLoaded', generateChapterSets);
+
         // Close sidebar on escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && sidebar.classList.contains('active')) {
                 toggleSidebar();
+            }
+            // Also close music page on escape
+            const musicOverlay = document.getElementById('musicPageOverlay');
+            if (e.key === 'Escape' && musicOverlay && musicOverlay.classList.contains('visible')) {
+                toggleMusicPage();
             }
         });
 
@@ -3177,6 +3603,8 @@
                     saveParentAudioState();
                     // Notify iframe of the new song
                     notifyIframe({ type: 'parentAudioChanged', title: nextTitle, audioPath: nextPath });
+                    // Update the rectangle highlight
+                    updateRectangleFromAudio();
                 }).catch(e => {
                     console.log('Auto-play next failed:', e);
                 });
@@ -3317,6 +3745,8 @@
                     parentAudio.play().then(() => {
                         updateControlBarUI(data.title, true);
                         saveParentAudioState();
+                        // Update rectangle highlight
+                        updateRectangleFromAudio();
                     }).catch(e => {
                         console.log('Audio play failed:', e);
                         updateControlBarUI(data.title, false);
@@ -3354,6 +3784,28 @@
             }
         }
 
+        // Auto-play when iframe loads (triggered from music page rectangle click)
+        window.pendingAutoPlay = false;
+        document.getElementById('chapterIframe').addEventListener('load', function() {
+            if (window.pendingAutoPlay) {
+                window.pendingAutoPlay = false;
+                // Wait a moment for the iframe to fully initialize
+                setTimeout(() => {
+                    try {
+                        const iframeDoc = this.contentDocument || this.contentWindow.document;
+                        // Find the "Listen Now (Common Melody)" button - it's usually index 0
+                        const audioButtons = iframeDoc.querySelectorAll('.audio-btn');
+                        if (audioButtons.length > 0) {
+                            // Click the first button (Common Melody)
+                            audioButtons[0].click();
+                        }
+                    } catch (e) {
+                        console.log('Auto-play trigger failed:', e);
+                    }
+                }, 500);
+            }
+        });
+
         // On page load, restore audio state if exists
         document.addEventListener('DOMContentLoaded', () => {
             const state = JSON.parse(localStorage.getItem('audioState') || '{}');
@@ -3365,6 +3817,8 @@
                 updateControlBarUI(state.title, false);
                 // Show toast message
                 showAudioToast('Restore previous track playback when the play button is activated');
+                // Update rectangle highlight after a short delay (wait for grid to generate)
+                setTimeout(updateRectangleFromAudio, 100);
             }
         });
 
