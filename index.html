@@ -138,40 +138,90 @@
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             padding-bottom: calc(150px + env(safe-area-inset-bottom, 20px));
+            transform-origin: bottom center;
+            opacity: 0;
         }
         .music-page-overlay.visible {
             display: block;
+            animation: overlayExpand 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        .music-page-overlay.visible.no-animation {
+            animation: none;
+            opacity: 1;
+            transform: none;
+        }
+        .music-page-overlay.closing {
+            display: block;
+            animation: overlayCollapse 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes overlayExpand {
+            0% {
+                opacity: 0;
+                transform: translateY(100%) scaleY(0.3);
+                border-radius: 20px 20px 0 0;
+            }
+            50% {
+                opacity: 1;
+                border-radius: 10px 10px 0 0;
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scaleY(1);
+                border-radius: 0;
+            }
+        }
+        @keyframes overlayCollapse {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scaleY(1);
+                border-radius: 0;
+            }
+            50% {
+                opacity: 1;
+                border-radius: 10px 10px 0 0;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100%) scaleY(0.3);
+                border-radius: 20px 20px 0 0;
+            }
         }
         .music-page-close {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 10000;
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            transform: translateY(-50%);
+            z-index: 101;
             background: rgba(255,255,255,0.15);
-            border: none;
-            border-radius: 50%;
-            width: 48px;
-            height: 48px;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 20px;
+            padding: 6px 16px;
             cursor: pointer;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
+            gap: 2px;
             transition: all 0.3s ease;
         }
         .music-page-close:hover {
             background: rgba(255,255,255,0.25);
-            transform: rotate(90deg);
+            transform: translateY(-50%) translateY(2px);
         }
-        .music-page-close svg {
-            width: 24px;
-            height: 24px;
-            stroke: white;
-            stroke-width: 2;
+        .music-page-close .handle-bar {
+            width: 32px;
+            height: 3px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 2px;
+        }
+        .music-page-close .handle-chevron {
+            font-size: 0.75em;
+            color: rgba(255,255,255,0.7);
+            line-height: 1;
         }
         .music-page-content {
             max-width: 800px;
             margin: 0 auto;
-            padding: 80px 24px 40px;
+            padding: 20px 24px 40px;
             min-height: 100vh;
         }
         /* Sticky Header */
@@ -183,8 +233,8 @@
             flex-direction: column;
             gap: 12px;
             padding: 15px 20px 18px;
-            margin: -80px -24px 20px -24px;
-            padding-top: 75px;
+            margin: -20px -24px 20px -24px;
+            padding-top: 20px;
             background: linear-gradient(180deg, var(--primary) 0%, var(--primary) 90%, rgba(30, 58, 95, 0) 100%);
             border-bottom: 1px solid rgba(201, 162, 39, 0.2);
         }
@@ -198,36 +248,31 @@
             margin-bottom: 5px;
             justify-content: center;
             gap: 12px;
+            position: relative;
+            padding: 0 70px;
         }
         /* Header minimize button */
         .header-minimize-btn {
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 16px;
-            padding: 6px 12px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
-            gap: 5px;
+            justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
             color: white;
-            font-size: 0.75em;
-            font-weight: 500;
+            font-size: 0.85em;
         }
         .header-minimize-btn:hover {
-            background: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.25);
+            transform: scale(1.1);
         }
         .header-minimize-btn .minimize-icon {
             transition: transform 0.3s ease;
-            font-size: 0.9em;
-        }
-        .header-minimize-btn .minimize-text-hide,
-        .header-minimize-btn .minimize-text-show {
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .header-minimize-btn .minimize-text-show {
-            display: none;
+            line-height: 1;
         }
         /* Minimized header state */
         .music-page-header.minimized {
@@ -241,12 +286,6 @@
         }
         .music-page-header.minimized .header-minimize-btn .minimize-icon {
             transform: rotate(180deg);
-        }
-        .music-page-header.minimized .header-minimize-btn .minimize-text-hide {
-            display: none;
-        }
-        .music-page-header.minimized .header-minimize-btn .minimize-text-show {
-            display: inline;
         }
         .header-controls-row {
             display: flex;
@@ -489,9 +528,9 @@
         /* Happy Face Emoji on Rectangles */
         .chapter-rect .heard-emoji {
             position: absolute;
-            top: 2px;
-            left: 3px;
-            font-size: 0.9em;
+            top: 1px;
+            left: 2px;
+            font-size: 0.55em;
             line-height: 1;
             opacity: 0;
             transform: scale(0);
@@ -516,33 +555,42 @@
             padding: 10px 0;
         }
         .chapter-set {
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         .chapter-set-header {
-            background: rgba(201, 162, 39, 0.3);
-            color: var(--accent);
-            padding: 10px 16px;
+            background: linear-gradient(135deg, rgba(30, 58, 95, 0.8) 0%, rgba(45, 74, 111, 0.7) 100%);
+            color: rgba(255,255,255,0.95);
+            padding: 16px 26px;
             font-weight: 600;
             font-size: 1.1em;
             cursor: pointer;
             display: flex;
-            width: 100%;
+            width: 80%;
             justify-content: space-between;
             align-items: center;
-            gap: 8px;
+            gap: 16px;
             transition: all 0.2s ease;
             user-select: none;
-            border-radius: 4px;
-            margin-bottom: 6px;
+            border-radius: 10px;
+            margin-bottom: 5px;
+            border: 1px solid rgba(201, 162, 39, 0.3);
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
         .chapter-set-header:hover {
-            background: rgba(201, 162, 39, 0.5);
+            background: linear-gradient(135deg, rgba(40, 70, 110, 0.9) 0%, rgba(55, 85, 125, 0.8) 100%);
+            color: var(--accent);
+            border-color: rgba(201, 162, 39, 0.6);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .chapter-set-header .set-title {
+            flex: none;
         }
         .chapter-set-header .set-arrow {
             transition: transform 0.3s ease;
-            font-size: 0.7em;
+            font-size: 0.8em;
+            opacity: 0.6;
         }
         .chapter-set.collapsed .set-arrow {
             transform: rotate(-90deg);
@@ -552,10 +600,10 @@
         }
         .chapter-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 8px;
-            padding: 8px 0;
-            min-height: 50px;
+            grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+            gap: 5px;
+            padding: 5px 0;
+            min-height: 30px;
         }
         .chapter-rect {
             display: flex;
@@ -565,12 +613,12 @@
             text-align: center;
             background: linear-gradient(145deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%);
             color: white;
-            padding: 16px 12px;
-            min-height: 100px;
+            padding: 10px 7px;
+            min-height: 60px;
             cursor: pointer;
             transition: all 0.2s ease;
             border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 8px;
+            border-radius: 5px;
             text-decoration: none;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
@@ -593,15 +641,15 @@
             background: linear-gradient(145deg, rgba(201, 162, 39, 0.4) 0%, rgba(201, 162, 39, 0.25) 100%);
         }
         .chapter-rect .ch-num {
-            font-size: 1.8em;
+            font-size: 1.1em;
             font-weight: 700;
             color: var(--accent);
-            margin-bottom: 6px;
+            margin-bottom: 3px;
         }
         .chapter-rect .ch-title {
-            font-size: 1em;
+            font-size: 0.65em;
             font-weight: 400;
-            line-height: 1.3;
+            line-height: 1.2;
             opacity: 0.9;
             overflow: hidden;
             display: -webkit-box;
@@ -612,60 +660,69 @@
         .chapter-rect.playing {
             background: linear-gradient(145deg, rgba(201, 162, 39, 0.5) 0%, rgba(201, 162, 39, 0.3) 100%);
             border-color: var(--accent);
-            box-shadow: 0 0 15px rgba(201, 162, 39, 0.4);
+            box-shadow: 0 0 10px rgba(201, 162, 39, 0.4);
         }
         .chapter-rect.playing::after {
             content: '✓';
             position: absolute;
-            top: 6px;
-            right: 8px;
-            font-size: 1.4em;
+            top: 3px;
+            right: 4px;
+            font-size: 0.85em;
             color: #4ade80;
             font-weight: bold;
         }
         .chapter-rect {
             position: relative;
         }
-        /* Spotlight sections have different color */
+        /* Spotlight sections */
         .chapter-set.spotlight .chapter-set-header {
-            background: rgba(45, 74, 111, 0.6);
-            color: var(--accent);
+            color: rgba(255,200,200,0.9);
+        }
+        .chapter-set.spotlight .chapter-set-header:hover {
+            color: #ff9999;
         }
         .chapter-set.spotlight .chapter-rect {
             background: linear-gradient(145deg, rgba(201, 162, 39, 0.15) 0%, rgba(201, 162, 39, 0.08) 100%);
             border-color: rgba(201, 162, 39, 0.15);
         }
         @media (hover: hover) and (pointer: fine) {
-            .chapter-set.spotlight .chapter-set-header:hover {
-                background: rgba(45, 74, 111, 0.8);
-            }
             .chapter-set.spotlight .chapter-rect:hover {
                 background: linear-gradient(145deg, rgba(201, 162, 39, 0.4) 0%, rgba(201, 162, 39, 0.25) 100%);
             }
         }
         @media (max-width: 600px) {
             .chapter-grid {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
             }
             .chapter-rect {
-                padding: 14px 10px;
-                min-height: 90px;
+                padding: 8px 6px;
+                min-height: 54px;
             }
             .chapter-rect .ch-num {
-                font-size: 2em;
+                font-size: 1em;
             }
             .chapter-rect .ch-title {
-                font-size: 1.1em;
+                font-size: 0.6em;
             }
             .chapter-set-header {
-                font-size: 1.2em;
-                padding: 12px 16px;
+                font-size: 1em;
+                padding: 13px 21px;
             }
             .music-page-header {
                 gap: 10px;
                 padding: 12px 15px 15px;
-                padding-top: 65px;
-                margin: -65px -15px 15px -15px;
+                padding-top: 15px;
+                margin: -15px -15px 15px -15px;
+            }
+            .header-title-row {
+                padding: 0 55px;
+            }
+            .music-page-close {
+                padding: 5px 12px;
+                left: 8px;
+            }
+            .music-page-close .handle-bar {
+                width: 26px;
             }
             .header-controls-row {
                 gap: 10px;
@@ -724,6 +781,20 @@
             .music-page-header {
                 gap: 8px;
             }
+            .header-title-row {
+                padding: 0 45px;
+            }
+            .music-page-close {
+                padding: 4px 10px;
+                left: 5px;
+            }
+            .music-page-close .handle-bar {
+                width: 22px;
+                height: 2px;
+            }
+            .music-page-close .handle-chevron {
+                font-size: 0.65em;
+            }
             .header-controls-row {
                 gap: 8px;
             }
@@ -752,7 +823,7 @@
                 transform: translateX(22px);
             }
             .chapter-grid {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(4, 1fr);
             }
         }
 
@@ -1254,6 +1325,45 @@
             font-family: 'Segoe UI', sans-serif;
         }
         #audio-control-bar.visible { display: block; }
+        .acb-expand-btn {
+            background: rgba(201, 162, 39, 0.3);
+            border: 1px solid rgba(201, 162, 39, 0.5);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            color: #c9a227;
+            font-size: 1.1em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .acb-expand-btn:hover {
+            background: rgba(201, 162, 39, 0.5);
+            transform: scale(1.1);
+        }
+        .acb-expand-btn .expand-icon-closed,
+        .acb-expand-btn .expand-icon-open {
+            position: absolute;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .acb-expand-btn .expand-icon-closed {
+            opacity: 1;
+        }
+        .acb-expand-btn .expand-icon-open {
+            opacity: 0;
+            transform: rotate(-90deg);
+        }
+        .acb-expand-btn.overlay-open .expand-icon-closed {
+            opacity: 0;
+            transform: rotate(90deg);
+        }
+        .acb-expand-btn.overlay-open .expand-icon-open {
+            opacity: 1;
+            transform: rotate(0deg);
+        }
         .acb-container {
             max-width: 800px;
             margin: 0 auto;
@@ -1412,21 +1522,18 @@
     <div class="music-page-overlay" id="musicPageOverlay">
         <!-- Toast notification for music overlay -->
         <div id="music-overlay-toast" style="display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 10001; font-size: 0.9em; text-align: center; max-width: 90%;"></div>
-        <button class="music-page-close" onclick="toggleMusicPage()" aria-label="Close music page">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </button>
         <div class="music-page-content">
             <!-- Sticky Header with Title and Controls -->
             <div class="music-page-header" id="musicPageHeader">
                 <!-- Row 1: Title with minimize toggle -->
                 <div class="header-row header-title-row">
+                    <button class="music-page-close" onclick="toggleMusicPage()" aria-label="Return to page">
+                        <span class="handle-bar"></span>
+                        <span class="handle-chevron">▼</span>
+                    </button>
                     <h1 class="music-page-title">Bible Songs</h1>
                     <button class="header-minimize-btn" onclick="toggleHeaderMinimize()" id="headerMinBtn" title="Minimize header">
                         <span class="minimize-icon">▲</span>
-                        <span class="minimize-text-hide">Hide</span>
-                        <span class="minimize-text-show">More</span>
                     </button>
                 </div>
 
@@ -3661,46 +3768,98 @@
         hamburger.addEventListener('click', toggleSidebar);
         overlay.addEventListener('click', toggleSidebar);
 
-        // Music Page Toggle
+        // Music Page Toggle with animation
         function toggleMusicPage() {
             const musicOverlay = document.getElementById('musicPageOverlay');
-            if (musicOverlay) {
-                const isOpening = !musicOverlay.classList.contains('visible');
-                musicOverlay.classList.toggle('visible');
+            const expandBtn = document.getElementById('acb-expand-btn');
+            if (!musicOverlay) return;
 
-                // Save overlay state to localStorage
-                localStorage.setItem('bibleSongsOverlayOpen', isOpening ? 'true' : 'false');
+            const isCurrentlyOpen = musicOverlay.classList.contains('visible');
+            const isClosing = musicOverlay.classList.contains('closing');
 
-                // Prevent body scroll when music page is open
-                if (isOpening) {
-                    document.body.style.overflow = 'hidden';
-                } else {
-                    // Restore normal scroll when closing
+            // Prevent double-clicks during animation
+            if (isClosing) return;
+
+            if (isCurrentlyOpen) {
+                // Close with animation
+                musicOverlay.classList.add('closing');
+                musicOverlay.classList.remove('visible');
+                if (expandBtn) expandBtn.classList.remove('overlay-open');
+
+                // Wait for animation to complete
+                setTimeout(() => {
+                    musicOverlay.classList.remove('closing');
                     document.body.style.overflow = '';
-                    // If a chapter was loaded while overlay was open, ensure correct display
+
+                    // Restore correct display for underlying content
                     const chapterFrame = document.getElementById('chapterFrame');
                     const mainContent = document.getElementById('mainContent');
                     if (document.body.classList.contains('chapter-view')) {
-                        // In chapter view: show chapter, hide main
                         if (chapterFrame) chapterFrame.style.display = 'block';
                         if (mainContent) mainContent.style.display = 'none';
                     } else {
-                        // In main view: show main, hide chapter
                         if (chapterFrame) chapterFrame.style.display = 'none';
                         if (mainContent) mainContent.style.display = 'block';
                     }
-                }
+                }, 600); // Match animation duration (0.6s)
+
+                localStorage.setItem('bibleSongsOverlayOpen', 'false');
+            } else {
+                // Open with animation
+                musicOverlay.classList.add('visible');
+                if (expandBtn) expandBtn.classList.add('overlay-open');
+                document.body.style.overflow = 'hidden';
+                localStorage.setItem('bibleSongsOverlayOpen', 'true');
+
+                // After animation starts, scroll to currently playing song
+                setTimeout(() => {
+                    scrollToPlayingSong();
+                }, 100);
             }
         }
 
-        // Restore overlay state on page load
+        // Scroll to the currently playing song and collapse other playlists
+        function scrollToPlayingSong() {
+            const playingRect = document.querySelector('.chapter-rect.playing');
+            if (!playingRect) return;
+
+            // Find the parent chapter-set of the playing song
+            const playingSet = playingRect.closest('.chapter-set');
+
+            // Collapse all chapter sets except the one with the playing song
+            document.querySelectorAll('.chapter-set').forEach(set => {
+                if (set === playingSet) {
+                    set.classList.remove('collapsed');
+                } else {
+                    set.classList.add('collapsed');
+                }
+            });
+
+            // Scroll the playing rectangle into view with smooth animation
+            setTimeout(() => {
+                playingRect.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 150);
+        }
+
+        // Restore overlay state on page load (no animation)
         function restoreOverlayState() {
             const wasOpen = localStorage.getItem('bibleSongsOverlayOpen');
             if (wasOpen === 'true') {
                 const musicOverlay = document.getElementById('musicPageOverlay');
+                const expandBtn = document.getElementById('acb-expand-btn');
                 if (musicOverlay) {
-                    musicOverlay.classList.add('visible');
+                    musicOverlay.classList.add('visible', 'no-animation');
                     document.body.style.overflow = 'hidden';
+                    if (expandBtn) expandBtn.classList.add('overlay-open');
+                    // Remove no-animation after a frame so future toggles animate
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            musicOverlay.classList.remove('no-animation');
+                        });
+                    });
                 }
             }
         }
@@ -3781,7 +3940,7 @@
                 const headerText = titleEl.textContent.replace('▶', '').trim();
                 const header = document.createElement('div');
                 header.className = 'chapter-set-header';
-                header.innerHTML = `<span>${headerText}</span><span class="set-arrow">▼</span>`;
+                header.innerHTML = `<span class="set-title">${headerText}</span><span class="set-arrow">▼</span>`;
                 header.onclick = () => setDiv.classList.toggle('collapsed');
                 setDiv.appendChild(header);
 
@@ -4227,6 +4386,14 @@
             <div class="acb-top-row">
                 <span class="acb-song-title" id="acb-title">No song playing</span>
                 <span class="acb-time"><span id="acb-current">0:00</span> / <span id="acb-duration">0:00</span></span>
+                <button class="acb-expand-btn" id="acb-expand-btn" onclick="toggleMusicPage()" title="Open song library">
+                    <svg class="expand-icon-closed" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M4 6h16v2H4zm4 5h12v2H8zm-4 5h16v2H4z"/>
+                    </svg>
+                    <svg class="expand-icon-open" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M7 10l5 5 5-5H7z"/>
+                    </svg>
+                </button>
             </div>
             <div class="acb-bottom-row">
                 <button class="acb-btn" onclick="acbSkip(-10)" title="Back 10s"><span class="acb-skip-text">-10</span></button>
@@ -4435,6 +4602,33 @@
             return chapters;
         }
 
+        // Update chapter page (iframe) and sidebar when song changes
+        function updateChapterPageAndSidebar(chapterName) {
+            if (!chapterName) return;
+
+            // Update iframe if chapter view is already open
+            const chapterFrame = document.getElementById('chapterFrame');
+            const chapterIframe = document.getElementById('chapterIframe');
+
+            if (document.body.classList.contains('chapter-view') && chapterFrame && chapterIframe) {
+                chapterIframe.src = chapterName + '.html';
+            }
+
+            // Update sidebar to highlight current chapter
+            document.querySelectorAll('.sidebar-chapter-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') && link.getAttribute('href').includes(chapterName)) {
+                    link.classList.add('active');
+                    // Expand parent book
+                    const parentBook = link.closest('.sidebar-book');
+                    if (parentBook) parentBook.classList.add('expanded');
+                }
+            });
+
+            // Update URL (use replaceState to avoid polluting history during auto-play)
+            window.history.replaceState({}, '', 'index.html?chapter=' + chapterName);
+        }
+
         // Play next song based on loop mode
         function playNextSong() {
             // Always save state and notify iframe when song ends
@@ -4466,6 +4660,7 @@
                         const nextChapter = playlistChapters[nextIndex];
                         window.playChapterAudio(nextChapter);
                         markRectanglePlaying(nextChapter);
+                        updateChapterPageAndSidebar(nextChapter);
                     }
                     break;
 
@@ -4478,6 +4673,7 @@
                         const nextChapter = allChapters[nextIndex];
                         window.playChapterAudio(nextChapter);
                         markRectanglePlaying(nextChapter);
+                        updateChapterPageAndSidebar(nextChapter);
                     }
                     break;
 
@@ -4496,6 +4692,7 @@
                         }
                         window.playChapterAudio(randomChapter);
                         markRectanglePlaying(randomChapter);
+                        updateChapterPageAndSidebar(randomChapter);
                     }
                     break;
             }
