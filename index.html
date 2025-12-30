@@ -204,7 +204,8 @@
             font-weight: 600;
             font-size: 1.1em;
             cursor: pointer;
-            display: inline-flex;
+            display: flex;
+            width: 100%;
             justify-content: space-between;
             align-items: center;
             gap: 8px;
@@ -212,6 +213,8 @@
             user-select: none;
             border-radius: 4px;
             margin-bottom: 6px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
         .chapter-set-header:hover {
             background: rgba(201, 162, 39, 0.5);
@@ -229,7 +232,9 @@
         .chapter-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 4px;
+            gap: 8px;
+            padding: 8px 0;
+            min-height: 50px;
         }
         .chapter-rect {
             display: flex;
@@ -237,15 +242,17 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            background: linear-gradient(145deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%);
+            background: linear-gradient(145deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%);
             color: white;
             padding: 16px 12px;
             min-height: 100px;
             cursor: pointer;
             transition: all 0.2s ease;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
             text-decoration: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
         .chapter-rect:hover {
             background: linear-gradient(145deg, rgba(201, 162, 39, 0.4) 0%, rgba(201, 162, 39, 0.25) 100%);
@@ -3215,7 +3222,7 @@
             // Find and mark the matching rectangle
             const allRects = document.querySelectorAll('.chapter-rect');
             allRects.forEach(rect => {
-                const href = rect.getAttribute('href') || '';
+                const href = rect.getAttribute('data-href') || rect.getAttribute('href') || '';
                 if (href.includes(chapterName)) {
                     rect.classList.add('playing');
                     // Scroll the rectangle into view if music page is open
@@ -3282,13 +3289,12 @@
                 chapters.forEach((chapter) => {
                     // Skip Introduction link - it shouldn't be in the music overlay
                     const chapterHref = chapter.getAttribute('href') || '';
-                    if (chapter.classList.contains('intro-link') ||
-                        chapterHref === 'index.html' ||
-                        (!chapterHref.startsWith('Chapter-') && !chapterHref.startsWith('Spotlight-'))) {
+                    if (chapter.classList.contains('intro-link') || chapterHref === 'index.html') {
                         return;
                     }
 
-                    const rect = document.createElement('a');
+                    // Use div instead of anchor to avoid any navigation issues on iOS
+                    const rect = document.createElement('div');
                     rect.className = 'chapter-rect';
 
                     // Extract chapter number and title from text like "(001) 1. The Promised King"
@@ -3311,59 +3317,70 @@
                     rect.appendChild(numSpan);
                     rect.appendChild(titleSpan);
 
-                    // Get the href from the sidebar link
+                    // Get the href from the sidebar link and store as data attribute
                     const href = chapter.getAttribute('href');
-                    rect.href = href;
+                    rect.setAttribute('data-href', href);
 
                     // Store the full title for tooltip
                     rect.title = chapterText;
 
                     rect.onclick = (e) => {
                         e.preventDefault();
+                        e.stopPropagation();
 
+                        // Extract chapter name from href
+                        // Handle both formats:
+                        // - Original: "Chapter-001-Matthew-01.html"
+                        // - Updated: "index.html?chapter=Chapter-001-Matthew-01"
+                        let chapterName;
+                        if (href.includes('?chapter=')) {
+                            // Extract from query parameter format
+                            const urlParams = new URLSearchParams(href.split('?')[1]);
+                            chapterName = urlParams.get('chapter');
+                        } else {
+                            // Original format - just remove .html
+                            chapterName = href.replace('.html', '');
+                        }
+
+                        if (!chapterName) {
+                            console.log('Could not extract chapter name from:', href);
+                            return;
+                        }
+
+                        // CRITICAL: Play audio FIRST, immediately after user gesture
+                        // iOS Safari requires synchronous path from click to audio.play()
+                        if (window.playChapterAudio) {
+                            window.playChapterAudio(chapterName);
+                        }
+
+                        // Mark this rectangle as playing (shows green checkmark)
+                        markRectanglePlaying(chapterName);
+
+                        // Load chapter in iframe (in background, after audio starts)
                         const chapterFrame = document.getElementById('chapterFrame');
                         const chapterIframe = document.getElementById('chapterIframe');
                         const mainContent = document.getElementById('mainContent');
 
-                        // Check if this is the Introduction link or any link that would load index.html
-                        const isIntro = !href || href === 'index.html' || href.startsWith('index.html?') ||
-                                        (!href.startsWith('Chapter-') && !href.startsWith('Spotlight-'));
-
-                        if (isIntro) {
-                            // Introduction: show main content, hide chapter frame
-                            chapterFrame.style.display = 'none';
-                            chapterIframe.src = 'about:blank';
-                            mainContent.style.display = 'block';
-                            document.body.classList.remove('chapter-view');
-                            window.history.pushState({}, '', 'index.html');
-                            // Close music overlay
-                            toggleMusicPage();
-                            return;
-                        }
-
-                        // Navigate using the main page's navigation - extract just the filename without .html
-                        const chapterName = href.replace('.html', '');
-
-                        // Use the same navigation as sidebar links
-                        if (href.startsWith('index.html?chapter=')) {
-                            window.history.pushState({}, '', href);
-                        } else {
-                            window.history.pushState({}, '', 'index.html?chapter=' + chapterName);
-                        }
-
-                        // Load the chapter (but keep music page open)
                         chapterFrame.style.display = 'block';
                         mainContent.style.display = 'none';
                         document.body.classList.add('chapter-view');
-
-                        // Mark this rectangle as playing immediately
-                        markRectanglePlaying(chapterName);
-
-                        // Set flag to auto-play when iframe loads
-                        window.pendingAutoPlay = true;
-
-                        // Load the chapter page
                         chapterIframe.src = chapterName + '.html';
+
+                        // Update sidebar to highlight current chapter
+                        document.querySelectorAll('.sidebar-chapter-link').forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').includes(chapterName)) {
+                                link.classList.add('active');
+                                // Expand parent book
+                                const parentBook = link.closest('.sidebar-book');
+                                if (parentBook) parentBook.classList.add('expanded');
+                            }
+                        });
+
+                        // Update URL to reflect current chapter
+                        window.history.pushState({}, '', 'index.html?chapter=' + chapterName);
+
+                        // Overlay stays open
                     };
 
                     grid.appendChild(rect);
@@ -3375,7 +3392,10 @@
         }
 
         // Generate chapter sets on page load
-        document.addEventListener('DOMContentLoaded', generateChapterSets);
+        document.addEventListener('DOMContentLoaded', function() {
+            // Small delay to ensure all elements are fully rendered
+            setTimeout(generateChapterSets, 100);
+        });
 
         // Close sidebar on escape key
         document.addEventListener('keydown', (e) => {
@@ -3542,6 +3562,19 @@
         const parentAudio = document.getElementById('parent-audio-player');
         let currentAudioTitle = '';
         let sortedPlaylist = []; // Sorted list of all audio files for auto-play
+        let cachedAudiolinks = null; // Pre-cached audiolinks for synchronous access
+
+        // Pre-load audiolinks.json for instant access on rectangle clicks
+        // This is critical for iOS Safari which requires synchronous user gesture -> audio.play()
+        (function preloadAudiolinks() {
+            fetch('setup/audiolinks.json?t=' + Date.now())
+                .then(response => response.json())
+                .then(data => {
+                    cachedAudiolinks = data;
+                    console.log('Audiolinks pre-cached for rectangle clicks');
+                })
+                .catch(e => console.log('Failed to preload audiolinks:', e));
+        })();
 
         // Inactivity timer - "Are you still there?" after 1 hour
         const INACTIVITY_TIMEOUT = 60 * 60 * 1000; // 1 hour in milliseconds
@@ -3557,6 +3590,58 @@
             if (!parentAudio.paused && parentAudio.src) {
                 inactivityTimer = setTimeout(showStillThereModal, INACTIVITY_TIMEOUT);
             }
+        }
+
+        // Play audio for a chapter directly (called from music overlay rectangles)
+        // MUST be synchronous for iOS Safari - uses pre-cached audiolinks
+        // Explicitly assign to window for cross-script-block access
+        window.playChapterAudio = function playChapterAudio(chapterName) {
+            console.log('playChapterAudio called for:', chapterName);
+            // Use cached audiolinks (pre-loaded on page load)
+            if (!cachedAudiolinks) {
+                console.log('Audiolinks not cached yet, fetching...');
+                // Fallback: try to fetch, but this may not work on iOS due to async
+                fetch('setup/audiolinks.json?t=' + Date.now())
+                    .then(r => r.json())
+                    .then(data => {
+                        cachedAudiolinks = data;
+                        playChapterAudio(chapterName); // Retry with cache
+                    });
+                return;
+            }
+
+            const audioFiles = cachedAudiolinks[chapterName];
+
+            if (audioFiles && audioFiles !== 'sample-audio-file.wav sample-audio-file.wav') {
+                const files = audioFiles.split(' ');
+                const audioFile = files[0]; // Use first file (Common Melody)
+
+                if (audioFile && audioFile !== 'sample-audio-file.wav') {
+                    const audioPath = 'music/' + audioFile;
+                    const title = chapterName.replace(/-/g, ' ') + ' (Common)';
+
+                    // CRITICAL: Set src and play SYNCHRONOUSLY from user gesture
+                    // No await/fetch between click and play() for iOS Safari
+                    parentAudio.pause();
+                    parentAudio.src = audioPath;
+                    parentAudio.currentTime = 0;
+
+                    // Play immediately - this MUST happen synchronously from user click
+                    parentAudio.play().then(() => {
+                        currentAudioTitle = title;
+                        updateControlBarUI(title, true);
+                        saveParentAudioState();
+                        updateRectangleFromAudio();
+                    }).catch(e => {
+                        console.log('Audio play failed:', e);
+                        updateControlBarUI(title, false);
+                        showAudioToast('Could not play audio');
+                    });
+                    return;
+                }
+            }
+            // No audio available for this chapter
+            showAudioToast('Audio not available for this chapter');
         }
 
         function showStillThereModal() {
@@ -3825,22 +3910,6 @@
         // Auto-play when iframe loads (triggered from music page rectangle click)
         window.pendingAutoPlay = false;
         document.getElementById('chapterIframe').addEventListener('load', function() {
-            // Safety check: prevent index.html from loading in iframe (causes duplicate icons)
-            try {
-                const iframeSrc = this.contentWindow.location.href;
-                if (iframeSrc.includes('/index.html') || iframeSrc.endsWith('/')) {
-                    // Accidentally loaded index.html - clear it
-                    this.src = 'about:blank';
-                    document.getElementById('chapterFrame').style.display = 'none';
-                    document.getElementById('mainContent').style.display = 'block';
-                    document.body.classList.remove('chapter-view');
-                    window.pendingAutoPlay = false;
-                    return;
-                }
-            } catch (e) {
-                // Cross-origin or other error - ignore
-            }
-
             if (window.pendingAutoPlay) {
                 window.pendingAutoPlay = false;
                 const iframe = this;
