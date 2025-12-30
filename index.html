@@ -196,6 +196,42 @@
         }
         .header-title-row {
             margin-bottom: 5px;
+            justify-content: center;
+            gap: 12px;
+        }
+        /* Header minimize button */
+        .header-minimize-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 0.8em;
+        }
+        .header-minimize-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        .header-minimize-btn .minimize-icon {
+            transition: transform 0.3s ease;
+        }
+        /* Minimized header state */
+        .music-page-header.minimized {
+            padding-bottom: 10px;
+        }
+        .music-page-header.minimized .header-controls-row {
+            display: none;
+        }
+        .music-page-header.minimized .header-title-row {
+            margin-bottom: 0;
+        }
+        .music-page-header.minimized .header-minimize-btn .minimize-icon {
+            transform: rotate(180deg);
         }
         .header-controls-row {
             display: flex;
@@ -1357,10 +1393,13 @@
         </button>
         <div class="music-page-content">
             <!-- Sticky Header with Title and Controls -->
-            <div class="music-page-header">
-                <!-- Row 1: Title -->
+            <div class="music-page-header" id="musicPageHeader">
+                <!-- Row 1: Title with minimize toggle -->
                 <div class="header-row header-title-row">
                     <h1 class="music-page-title">Bible Songs</h1>
+                    <button class="header-minimize-btn" onclick="toggleHeaderMinimize()" id="headerMinBtn" title="Minimize header">
+                        <span class="minimize-icon">▲</span>
+                    </button>
                 </div>
 
                 <!-- Row 2: Melody Toggle and Action Buttons -->
@@ -4183,6 +4222,20 @@
             console.log('Melody type changed to:', melodyType === 0 ? 'Common' : 'Unique');
         }
 
+        // Toggle header minimize/expand
+        function toggleHeaderMinimize() {
+            const header = document.getElementById('musicPageHeader');
+            const btn = document.getElementById('headerMinBtn');
+            if (header) {
+                header.classList.toggle('minimized');
+                const isMinimized = header.classList.contains('minimized');
+                localStorage.setItem('bibleSongsHeaderMinimized', isMinimized);
+                if (btn) {
+                    btn.title = isMinimized ? 'Expand header' : 'Minimize header';
+                }
+            }
+        }
+
         // Loop Mode: none, song, playlist, all, random
         let loopMode = 'all'; // Default to repeat all
         let currentPlaylistChapters = []; // Chapters in current group/playlist
@@ -4230,6 +4283,19 @@
                         case 'all': icon.textContent = '🔁'; break;
                         case 'random': icon.textContent = '🔀'; break;
                     }
+                }
+            }
+
+            // Load header minimize state
+            const savedHeaderMinimized = localStorage.getItem('bibleSongsHeaderMinimized');
+            if (savedHeaderMinimized === 'true') {
+                const header = document.getElementById('musicPageHeader');
+                const btn = document.getElementById('headerMinBtn');
+                if (header) {
+                    header.classList.add('minimized');
+                }
+                if (btn) {
+                    btn.title = 'Expand header';
                 }
             }
         }
