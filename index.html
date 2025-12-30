@@ -180,31 +180,53 @@
             top: 0;
             z-index: 100;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            padding: 15px 20px;
+            flex-direction: column;
+            gap: 12px;
+            padding: 15px 20px 18px;
             margin: -80px -24px 20px -24px;
-            padding-top: 80px;
-            background: linear-gradient(to bottom, var(--primary) 0%, var(--primary) 85%, transparent 100%);
+            padding-top: 75px;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary) 90%, rgba(30, 58, 95, 0) 100%);
+            border-bottom: 1px solid rgba(201, 162, 39, 0.2);
+        }
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        .header-title-row {
+            margin-bottom: 5px;
+        }
+        .header-controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
         }
         .music-page-title {
             color: var(--accent);
             font-family: 'Playfair Display', serif;
-            font-size: 1.8em;
+            font-size: 2em;
             margin: 0;
-            white-space: nowrap;
+            text-align: center;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
 
         /* Melody Toggle Switch */
         .melody-toggle-container {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 14px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 25px;
-            flex-shrink: 0;
+            gap: 10px;
+            padding: 10px 16px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 30px;
+            border: 1px solid rgba(201, 162, 39, 0.3);
+        }
+        .melody-type-label {
+            color: var(--accent);
+            font-size: 0.95em;
+            font-weight: 600;
+            margin-right: 2px;
         }
         .melody-label {
             color: rgba(255,255,255,0.5);
@@ -215,11 +237,11 @@
         }
         .melody-label.active {
             color: var(--accent);
-            font-weight: 600;
+            font-weight: 700;
         }
         .melody-toggle {
             position: relative;
-            width: 56px;
+            width: 52px;
             height: 28px;
             flex-shrink: 0;
         }
@@ -235,60 +257,182 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(201, 162, 39, 0.4);
+            background-color: rgba(201, 162, 39, 0.35);
             transition: 0.3s;
             border-radius: 28px;
+            border: 2px solid rgba(201, 162, 39, 0.5);
         }
         .melody-slider:before {
             position: absolute;
             content: "";
-            height: 22px;
-            width: 22px;
-            left: 3px;
-            bottom: 3px;
-            background-color: var(--accent);
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background: linear-gradient(135deg, #c9a227 0%, #e8c547 100%);
             transition: 0.3s;
             border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
         .melody-toggle input:checked + .melody-slider {
-            background-color: rgba(201, 162, 39, 0.6);
+            background-color: rgba(201, 162, 39, 0.5);
         }
         .melody-toggle input:checked + .melody-slider:before {
-            transform: translateX(28px);
+            transform: translateX(24px);
         }
 
         /* Header Action Buttons */
         .music-header-buttons {
             display: flex;
-            gap: 8px;
-            flex-shrink: 0;
+            gap: 10px;
         }
         .music-header-btn {
             display: flex;
             align-items: center;
-            gap: 5px;
-            padding: 8px 12px;
-            background: rgba(255,255,255,0.15);
-            border: none;
-            border-radius: 20px;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 16px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 25px;
             color: white;
-            font-size: 0.85em;
+            font-size: 0.95em;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
             white-space: nowrap;
         }
         .music-header-btn:hover {
-            background: rgba(255,255,255,0.25);
+            background: rgba(255,255,255,0.22);
+            border-color: rgba(255,255,255,0.35);
+            transform: translateY(-1px);
         }
         .music-header-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.97);
         }
         .music-header-btn .btn-icon {
-            font-size: 0.9em;
-            transition: transform 0.3s ease;
+            font-size: 1.1em;
         }
         .music-header-btn.expanded .btn-icon {
             transform: rotate(180deg);
+        }
+        .music-header-btn.btn-danger {
+            background: rgba(220, 80, 80, 0.25);
+            border-color: rgba(220, 80, 80, 0.4);
+        }
+        .music-header-btn.btn-danger:hover {
+            background: rgba(220, 80, 80, 0.4);
+            border-color: rgba(220, 80, 80, 0.6);
+        }
+
+        /* Autoplay Mode Selector */
+        .loop-mode-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 25px;
+            border: 1px solid rgba(201, 162, 39, 0.3);
+        }
+        .loop-label {
+            color: var(--accent);
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .loop-icon {
+            font-size: 1.2em;
+        }
+        .loop-mode-select {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 0.95em;
+            font-weight: 500;
+            cursor: pointer;
+            outline: none;
+            padding-right: 5px;
+        }
+        .loop-mode-select option {
+            background: #1e3a5f;
+            color: white;
+            padding: 10px;
+        }
+        .loop-mode-container.mode-none .loop-icon {
+            opacity: 0.4;
+        }
+
+        /* Undo Toast - Floating */
+        .undo-toast {
+            display: none;
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, rgba(60, 160, 60, 0.95) 0%, rgba(40, 130, 40, 0.95) 100%);
+            border-radius: 35px;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+            z-index: 10000;
+            animation: floatUp 0.3s ease;
+        }
+        .undo-toast.visible {
+            display: flex;
+        }
+        @keyframes floatUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        .undo-message {
+            color: white;
+            font-weight: 600;
+            font-size: 1em;
+        }
+        .undo-btn {
+            background: white;
+            color: #2a7a2a;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .undo-btn:hover {
+            background: #f0f0f0;
+            transform: scale(1.05);
+        }
+        .undo-timer {
+            background: rgba(255,255,255,0.3);
+            color: white;
+            font-weight: 700;
+            font-size: 0.9em;
+            padding: 4px 10px;
+            border-radius: 12px;
+            min-width: 28px;
+            text-align: center;
+        }
+        .undo-cancel-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 1em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            margin-left: 4px;
+        }
+        .undo-cancel-btn:hover {
+            background: rgba(255,255,255,0.4);
         }
 
         /* Happy Face Emoji on Rectangles */
@@ -458,51 +602,87 @@
                 padding: 12px 16px;
             }
             .music-page-header {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 12px;
-                padding: 12px 15px;
-                padding-top: 70px;
-                margin: -70px -15px 15px -15px;
+                gap: 10px;
+                padding: 12px 15px 15px;
+                padding-top: 65px;
+                margin: -65px -15px 15px -15px;
+            }
+            .header-controls-row {
+                gap: 10px;
             }
             .music-page-title {
-                font-size: 1.6em;
+                font-size: 1.7em;
+            }
+            .melody-toggle-container {
+                padding: 10px 14px;
+                gap: 8px;
+            }
+            .melody-type-label {
+                font-size: 0.9em;
+            }
+            .melody-label {
+                font-size: 0.9em;
+            }
+            .music-header-buttons {
+                gap: 8px;
+            }
+            .music-header-btn {
+                padding: 10px 14px;
+                font-size: 0.9em;
+            }
+            .music-header-btn .btn-icon {
+                font-size: 1.2em;
+            }
+            .loop-mode-container {
+                padding: 8px 12px;
+            }
+            .loop-mode-select {
+                font-size: 0.9em;
+            }
+            .undo-toast {
+                padding: 10px 16px;
+                gap: 10px;
+            }
+            .undo-message {
+                font-size: 0.9em;
+            }
+            .undo-btn {
+                padding: 6px 12px;
+                font-size: 0.85em;
+            }
+        }
+        @media (max-width: 400px) {
+            .loop-mode-container {
+                padding: 6px 10px;
+            }
+            .loop-label {
+                display: none;
+            }
+            .loop-mode-select {
+                font-size: 0.85em;
+            }
+            .music-page-header {
+                gap: 8px;
+            }
+            .header-controls-row {
+                gap: 8px;
+            }
+            .music-page-title {
+                font-size: 1.5em;
             }
             .melody-toggle-container {
                 padding: 8px 12px;
-                gap: 8px;
+                gap: 6px;
+            }
+            .melody-type-label {
+                display: none;
             }
             .melody-label {
                 font-size: 0.85em;
             }
-            .music-header-buttons {
-                gap: 6px;
-            }
-            .music-header-btn {
-                padding: 6px 10px;
-                font-size: 0.8em;
-            }
-            .music-header-btn .btn-text {
-                display: none;
-            }
-        }
-        @media (max-width: 400px) {
-            .music-page-header {
-                gap: 10px;
-            }
-            .music-page-title {
-                font-size: 1.4em;
-            }
-            .melody-toggle-container {
-                padding: 6px 10px;
-                gap: 6px;
-            }
-            .melody-label {
-                font-size: 0.8em;
-            }
             .melody-toggle {
-                width: 46px;
-                height: 24px;
+                width: 48px;
+                height: 26px;
             }
             .melody-slider:before {
                 height: 18px;
@@ -1176,30 +1356,58 @@
             </svg>
         </button>
         <div class="music-page-content">
-            <!-- Sticky Header with Title and Toggle -->
+            <!-- Sticky Header with Title and Controls -->
             <div class="music-page-header">
-                <h1 class="music-page-title">Bible Songs</h1>
-
-                <!-- Melody Toggle Switch -->
-                <div class="melody-toggle-container">
-                    <span class="melody-label melody-label-left active" id="commonLabel">Common</span>
-                    <label class="melody-toggle">
-                        <input type="checkbox" id="melodyToggle" onchange="toggleMelodyType()">
-                        <span class="melody-slider"></span>
-                    </label>
-                    <span class="melody-label melody-label-right" id="uniqueLabel">Unique</span>
+                <!-- Row 1: Title -->
+                <div class="header-row header-title-row">
+                    <h1 class="music-page-title">Bible Songs</h1>
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="music-header-buttons">
-                    <button class="music-header-btn" onclick="toggleAllSets()" id="toggleAllSetsBtn" title="Minimize/Expand All">
-                        <span class="btn-icon">▼</span>
-                        <span class="btn-text">Minimize</span>
-                    </button>
-                    <button class="music-header-btn" onclick="clearListeningHistory()" title="Clear History">
-                        <span class="btn-icon">✕</span>
-                        <span class="btn-text">Clear History</span>
-                    </button>
+                <!-- Row 2: Melody Toggle and Action Buttons -->
+                <div class="header-row header-controls-row">
+                    <!-- Melody Toggle Switch -->
+                    <div class="melody-toggle-container">
+                        <span class="melody-type-label">Melody:</span>
+                        <span class="melody-label melody-label-left active" id="commonLabel">Common</span>
+                        <label class="melody-toggle">
+                            <input type="checkbox" id="melodyToggle" onchange="toggleMelodyType()">
+                            <span class="melody-slider"></span>
+                        </label>
+                        <span class="melody-label melody-label-right" id="uniqueLabel">Unique</span>
+                    </div>
+
+                    <!-- Autoplay Mode Selector -->
+                    <div class="loop-mode-container">
+                        <span class="loop-label">Autoplay:</span>
+                        <span class="loop-icon" id="loopIcon">🔁</span>
+                        <select id="loopModeSelect" onchange="changeLoopMode()" class="loop-mode-select">
+                            <option value="none">Off</option>
+                            <option value="song">Same Song</option>
+                            <option value="playlist">This Group</option>
+                            <option value="all" selected>All Songs</option>
+                            <option value="random">Shuffle</option>
+                        </select>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="music-header-buttons">
+                        <button class="music-header-btn" onclick="toggleAllSets()" id="toggleAllSetsBtn" title="Minimize/Expand All">
+                            <span class="btn-icon">📁</span>
+                            <span class="btn-text">Minimize</span>
+                        </button>
+                        <button class="music-header-btn btn-danger" onclick="confirmClearHistory()" id="clearHistoryBtn" title="Clear Listening History">
+                            <span class="btn-icon">🗑️</span>
+                            <span class="btn-text">Reset</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Undo Toast (hidden by default) -->
+                <div class="undo-toast" id="undoToast">
+                    <span class="undo-message">History cleared</span>
+                    <button class="undo-btn" onclick="undoClearHistory()">↩️ Undo</button>
+                    <span class="undo-timer" id="undoTimer">10</span>
+                    <button class="undo-cancel-btn" onclick="cancelUndo()">✕</button>
                 </div>
             </div>
 
@@ -3393,6 +3601,9 @@
                 const isOpening = !musicOverlay.classList.contains('visible');
                 musicOverlay.classList.toggle('visible');
 
+                // Save overlay state to localStorage
+                localStorage.setItem('bibleSongsOverlayOpen', isOpening ? 'true' : 'false');
+
                 // Prevent body scroll when music page is open
                 if (isOpening) {
                     document.body.style.overflow = 'hidden';
@@ -3414,6 +3625,24 @@
                 }
             }
         }
+
+        // Restore overlay state on page load
+        function restoreOverlayState() {
+            const wasOpen = localStorage.getItem('bibleSongsOverlayOpen');
+            if (wasOpen === 'true') {
+                const musicOverlay = document.getElementById('musicPageOverlay');
+                if (musicOverlay) {
+                    musicOverlay.classList.add('visible');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+        }
+
+        // Run after DOM is ready and chapter sets are generated
+        document.addEventListener('DOMContentLoaded', function() {
+            // Delay slightly to ensure everything is rendered
+            setTimeout(restoreOverlayState, 150);
+        });
 
         // Mark a rectangle as currently playing
         function markRectanglePlaying(chapterName) {
@@ -3550,32 +3779,17 @@
                         e.preventDefault();
                         e.stopPropagation();
 
-                        // Extract chapter name from href
-                        // Handle both formats:
-                        // - Original: "Chapter-001-Matthew-01.html"
-                        // - Updated: "index.html?chapter=Chapter-001-Matthew-01"
-                        let chapterName;
-                        if (href.includes('?chapter=')) {
-                            // Extract from query parameter format
-                            const urlParams = new URLSearchParams(href.split('?')[1]);
-                            chapterName = urlParams.get('chapter');
-                        } else {
-                            // Original format - just remove .html
-                            chapterName = href.replace('.html', '');
-                        }
+                        // Get chapter name from data attribute (pre-computed, no parsing needed)
+                        const chapterName = rect.getAttribute('data-chapter');
+                        if (!chapterName) return;
 
-                        if (!chapterName) {
-                            console.log('Could not extract chapter name from:', href);
-                            return;
-                        }
-
-                        // CRITICAL: Play audio FIRST, immediately after user gesture
-                        // iOS Safari requires synchronous path from click to audio.play()
+                        // CRITICAL: Play audio IMMEDIATELY - first thing after user gesture
+                        // iOS Safari requires minimal code between click and audio.play()
                         if (window.playChapterAudio) {
                             window.playChapterAudio(chapterName);
                         }
 
-                        // Mark this rectangle as playing (shows green checkmark)
+                        // Everything else happens after play() starts
                         markRectanglePlaying(chapterName);
 
                         // Load chapter in iframe (in background, after audio starts)
@@ -3774,18 +3988,103 @@
             }
         }
 
-        // Clear all listening history
-        function clearListeningHistory() {
+        // Clear history with undo support
+        let undoBackup = null;
+        let undoTimer = null;
+        let undoCountdown = null;
+
+        function confirmClearHistory() {
             try {
+                // Backup current history for undo
+                undoBackup = localStorage.getItem(HEARD_STORAGE_KEY);
+
+                // Clear the history
                 localStorage.removeItem(HEARD_STORAGE_KEY);
+
                 // Remove heard class from all rectangles
                 document.querySelectorAll('.chapter-rect.heard').forEach(rect => {
                     rect.classList.remove('heard');
                 });
-                showAudioToast('Listening history cleared');
+
+                // Show undo toast with countdown
+                const toast = document.getElementById('undoToast');
+                const timerEl = document.getElementById('undoTimer');
+                let countdown = 10;
+
+                toast.classList.add('visible');
+                timerEl.textContent = countdown;
+
+                // Clear any existing timers
+                if (undoTimer) clearTimeout(undoTimer);
+                if (undoCountdown) clearInterval(undoCountdown);
+
+                // Countdown display
+                undoCountdown = setInterval(() => {
+                    countdown--;
+                    timerEl.textContent = countdown;
+                    if (countdown <= 0) {
+                        clearInterval(undoCountdown);
+                    }
+                }, 1000);
+
+                // Auto-hide after 10 seconds
+                undoTimer = setTimeout(() => {
+                    toast.classList.remove('visible');
+                    undoBackup = null;
+                    clearInterval(undoCountdown);
+                }, 10000);
+
             } catch (e) {
                 console.log('Error clearing history:', e);
             }
+        }
+
+        function undoClearHistory() {
+            try {
+                if (undoBackup) {
+                    // Restore the backup
+                    localStorage.setItem(HEARD_STORAGE_KEY, undoBackup);
+
+                    // Restore heard class on rectangles
+                    const heard = JSON.parse(undoBackup);
+                    document.querySelectorAll('.chapter-rect').forEach(rect => {
+                        const chapterName = rect.getAttribute('data-chapter');
+                        if (heard.includes(chapterName)) {
+                            rect.classList.add('heard');
+                        }
+                    });
+
+                    showAudioToast('History restored!');
+                }
+
+                // Hide the toast
+                const toast = document.getElementById('undoToast');
+                toast.classList.remove('visible');
+
+                // Clear timers
+                if (undoTimer) clearTimeout(undoTimer);
+                if (undoCountdown) clearInterval(undoCountdown);
+                undoBackup = null;
+
+            } catch (e) {
+                console.log('Error restoring history:', e);
+            }
+        }
+
+        // Cancel the undo toast (dismiss without restoring)
+        function cancelUndo() {
+            const toast = document.getElementById('undoToast');
+            toast.classList.remove('visible');
+
+            // Clear timers
+            if (undoTimer) clearTimeout(undoTimer);
+            if (undoCountdown) clearInterval(undoCountdown);
+            undoBackup = null;
+        }
+
+        // Legacy function (kept for compatibility)
+        function clearListeningHistory() {
+            confirmClearHistory();
         }
 
         // Toggle all chapter sets (minimize/expand)
@@ -3835,7 +4134,10 @@
                     <svg viewBox="0 0 24 24" id="acb-play-icon"><path d="M8 5v14l11-7z"/></svg>
                 </button>
                 <button class="acb-btn" onclick="acbSkip(10)" title="Forward 10s"><span class="acb-skip-text">+10</span></button>
-                <input type="range" class="acb-seek" id="acb-seek" value="0" min="0" max="100" oninput="acbSeek(this.value)">
+                <input type="range" class="acb-seek" id="acb-seek" value="0" min="0" max="100"
+                           ontouchstart="acbSeekStart()" onmousedown="acbSeekStart()"
+                           ontouchend="acbSeekEnd(this.value)" onmouseup="acbSeekEnd(this.value)"
+                           onchange="acbSeekEnd(this.value)">
                 <button class="acb-btn" onclick="acbStop()" title="Stop">
                     <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"/></svg>
                 </button>
@@ -3876,8 +4178,206 @@
                 commonLabel.classList.add('active');
                 uniqueLabel.classList.remove('active');
             }
+            // Save to localStorage
+            localStorage.setItem('bibleSongsMelodyType', melodyType);
             console.log('Melody type changed to:', melodyType === 0 ? 'Common' : 'Unique');
         }
+
+        // Loop Mode: none, song, playlist, all, random
+        let loopMode = 'all'; // Default to repeat all
+        let currentPlaylistChapters = []; // Chapters in current group/playlist
+
+        // Load saved settings from localStorage
+        function loadSavedSettings() {
+            // Load melody type
+            const savedMelodyType = localStorage.getItem('bibleSongsMelodyType');
+            if (savedMelodyType !== null) {
+                melodyType = parseInt(savedMelodyType);
+                const toggle = document.getElementById('melodyToggle');
+                const commonLabel = document.getElementById('commonLabel');
+                const uniqueLabel = document.getElementById('uniqueLabel');
+                if (toggle && commonLabel && uniqueLabel) {
+                    if (melodyType === 1) {
+                        toggle.checked = true;
+                        commonLabel.classList.remove('active');
+                        uniqueLabel.classList.add('active');
+                    } else {
+                        toggle.checked = false;
+                        commonLabel.classList.add('active');
+                        uniqueLabel.classList.remove('active');
+                    }
+                }
+            }
+
+            // Load loop mode
+            const savedLoopMode = localStorage.getItem('bibleSongsLoopMode');
+            if (savedLoopMode) {
+                loopMode = savedLoopMode;
+                const select = document.getElementById('loopModeSelect');
+                const container = document.querySelector('.loop-mode-container');
+                const icon = document.getElementById('loopIcon');
+                if (select) {
+                    select.value = loopMode;
+                }
+                if (container) {
+                    container.className = 'loop-mode-container mode-' + loopMode;
+                }
+                if (icon) {
+                    switch(loopMode) {
+                        case 'none': icon.textContent = '➡️'; break;
+                        case 'song': icon.textContent = '🔂'; break;
+                        case 'playlist': icon.textContent = '🔁'; break;
+                        case 'all': icon.textContent = '🔁'; break;
+                        case 'random': icon.textContent = '🔀'; break;
+                    }
+                }
+            }
+        }
+
+        // Load settings when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadSavedSettings);
+        } else {
+            loadSavedSettings();
+        }
+
+        // Change loop mode
+        function changeLoopMode() {
+            const select = document.getElementById('loopModeSelect');
+            const container = document.querySelector('.loop-mode-container');
+            const icon = document.getElementById('loopIcon');
+
+            loopMode = select.value;
+
+            // Update container class for styling
+            container.className = 'loop-mode-container mode-' + loopMode;
+
+            // Update icon based on mode
+            switch(loopMode) {
+                case 'none':
+                    icon.textContent = '➡️';
+                    break;
+                case 'song':
+                    icon.textContent = '🔂';
+                    break;
+                case 'playlist':
+                    icon.textContent = '🔁';
+                    break;
+                case 'all':
+                    icon.textContent = '🔁';
+                    break;
+                case 'random':
+                    icon.textContent = '🔀';
+                    break;
+            }
+
+            // Save to localStorage
+            localStorage.setItem('bibleSongsLoopMode', loopMode);
+            console.log('Loop mode changed to:', loopMode);
+        }
+
+        // Get all chapters from all rectangles
+        function getAllChapters() {
+            const chapters = [];
+            document.querySelectorAll('.chapter-rect').forEach(rect => {
+                const chapter = rect.getAttribute('data-chapter');
+                if (chapter) chapters.push(chapter);
+            });
+            return chapters;
+        }
+
+        // Get chapters in the same playlist/group as the current chapter
+        function getPlaylistChapters(currentChapter) {
+            const chapters = [];
+            // Find the chapter-set containing the current chapter
+            document.querySelectorAll('.chapter-set').forEach(set => {
+                const rects = set.querySelectorAll('.chapter-rect');
+                let found = false;
+                rects.forEach(rect => {
+                    if (rect.getAttribute('data-chapter') === currentChapter) {
+                        found = true;
+                    }
+                });
+                if (found) {
+                    rects.forEach(rect => {
+                        const chapter = rect.getAttribute('data-chapter');
+                        if (chapter) chapters.push(chapter);
+                    });
+                }
+            });
+            return chapters;
+        }
+
+        // Play next song based on loop mode
+        function playNextSong() {
+            // Always save state and notify iframe when song ends
+            saveParentAudioState();
+            if (typeof notifyIframe === 'function') {
+                notifyIframe({ type: 'parentAudioEnded' });
+            }
+
+            switch(loopMode) {
+                case 'none':
+                    // Stop - do nothing, just update UI to show paused
+                    updateControlBarUI(currentAudioTitle, false);
+                    return;
+
+                case 'song':
+                    // Repeat same song
+                    parentAudio.currentTime = 0;
+                    parentAudio.play().then(() => {
+                        updateControlBarUI(currentAudioTitle, true);
+                    }).catch(e => console.log('Replay failed:', e));
+                    break;
+
+                case 'playlist':
+                    // Play next in same group
+                    const playlistChapters = getPlaylistChapters(currentPlayingChapter);
+                    const playlistIndex = playlistChapters.indexOf(currentPlayingChapter);
+                    if (playlistIndex >= 0 && playlistChapters.length > 0) {
+                        const nextIndex = (playlistIndex + 1) % playlistChapters.length;
+                        const nextChapter = playlistChapters[nextIndex];
+                        window.playChapterAudio(nextChapter);
+                        markRectanglePlaying(nextChapter);
+                    }
+                    break;
+
+                case 'all':
+                    // Play next in all songs
+                    const allChapters = getAllChapters();
+                    const allIndex = allChapters.indexOf(currentPlayingChapter);
+                    if (allIndex >= 0 && allChapters.length > 0) {
+                        const nextIndex = (allIndex + 1) % allChapters.length;
+                        const nextChapter = allChapters[nextIndex];
+                        window.playChapterAudio(nextChapter);
+                        markRectanglePlaying(nextChapter);
+                    }
+                    break;
+
+                case 'random':
+                    // Play random song
+                    const randomChapters = getAllChapters();
+                    if (randomChapters.length > 0) {
+                        // Avoid playing same song if possible
+                        let randomChapter;
+                        if (randomChapters.length > 1) {
+                            do {
+                                randomChapter = randomChapters[Math.floor(Math.random() * randomChapters.length)];
+                            } while (randomChapter === currentPlayingChapter);
+                        } else {
+                            randomChapter = randomChapters[0];
+                        }
+                        window.playChapterAudio(randomChapter);
+                        markRectanglePlaying(randomChapter);
+                    }
+                    break;
+            }
+        }
+
+        // Listen for song end
+        parentAudio.addEventListener('ended', function() {
+            playNextSong();
+        });
 
         // Pre-load audiolinks.json for instant access on rectangle clicks
         // This is critical for iOS Safari which requires synchronous user gesture -> audio.play()
@@ -3952,27 +4452,32 @@
                     const audioPath = 'music/' + audioFile;
                     const title = chapterName.replace(/-/g, ' ') + ' (' + melodyName + ')';
 
-                    // Track current chapter for "heard" detection
-                    currentPlayingChapter = chapterName;
-                    currentChapterMarkedHeard = isChapterHeard(chapterName); // Don't re-mark if already heard
-
-                    // CRITICAL: Set src and play SYNCHRONOUSLY from user gesture
-                    // No await/fetch between click and play() for iOS Safari
-                    parentAudio.pause();
+                    // CRITICAL: Set src and play IMMEDIATELY - no other operations before play()
+                    // iOS Safari requires minimal code between user gesture and audio.play()
                     parentAudio.src = audioPath;
                     parentAudio.currentTime = 0;
 
-                    // Play immediately - this MUST happen synchronously from user click
-                    parentAudio.play().then(() => {
-                        currentAudioTitle = title;
-                        updateControlBarUI(title, true);
-                        saveParentAudioState();
-                        updateRectangleFromAudio();
-                    }).catch(e => {
-                        console.log('Audio play failed:', e);
-                        updateControlBarUI(title, false);
-                        showAudioToast('Could not play audio');
-                    });
+                    // Start playback FIRST, then do everything else
+                    const playPromise = parentAudio.play();
+
+                    // Track current chapter for "heard" detection (after play starts)
+                    currentPlayingChapter = chapterName;
+                    currentChapterMarkedHeard = isChapterHeard(chapterName);
+
+                    // Handle play result
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            currentAudioTitle = title;
+                            updateControlBarUI(title, true);
+                            saveParentAudioState();
+                            updateRectangleFromAudio();
+                            resetInactivityTimer();
+                        }).catch(e => {
+                            console.log('Audio play failed:', e);
+                            updateControlBarUI(title, false);
+                            showAudioToast('Tap play to start');
+                        });
+                    }
                     return;
                 }
             }
@@ -4031,42 +4536,6 @@
             } catch (e) {
                 console.log('Failed to load playlist:', e);
                 sortedPlaylist = [];
-            }
-        }
-
-        // Find and play the next song in the playlist
-        function playNextSong() {
-            if (sortedPlaylist.length === 0) return;
-
-            // Get current audio filename
-            const currentSrc = parentAudio.src || '';
-            const currentFile = currentSrc.includes('music/') ? currentSrc.split('music/').pop() : '';
-
-            // Find current song index
-            let currentIndex = sortedPlaylist.findIndex(file => file === currentFile);
-
-            // Get next song (loop to beginning if at end)
-            let nextIndex = (currentIndex + 1) % sortedPlaylist.length;
-            const nextFile = sortedPlaylist[nextIndex];
-
-            if (nextFile) {
-                const nextPath = 'music/' + nextFile;
-                // Extract title from filename (e.g., "Chapter-001-Matthew-01_v1-..." -> "Chapter 001 Matthew 01")
-                const titleMatch = nextFile.match(/^([^_]+)/);
-                const nextTitle = titleMatch ? titleMatch[1].replace(/-/g, ' ') : nextFile;
-
-                parentAudio.src = nextPath;
-                parentAudio.currentTime = 0;
-                parentAudio.play().then(() => {
-                    updateControlBarUI(nextTitle, true);
-                    saveParentAudioState();
-                    // Notify iframe of the new song
-                    notifyIframe({ type: 'parentAudioChanged', title: nextTitle, audioPath: nextPath });
-                    // Update the rectangle highlight
-                    updateRectangleFromAudio();
-                }).catch(e => {
-                    console.log('Auto-play next failed:', e);
-                });
             }
         }
 
@@ -4135,16 +4604,37 @@
             notifyIframe({ type: 'parentAudioStopped' });
         }
 
+        let isSeeking = false; // Flag to prevent timeupdate from overriding user seek
+
         function acbSkip(seconds) {
             if (!parentAudio.src) return;
-            parentAudio.currentTime = Math.max(0, Math.min(parentAudio.duration || 0, parentAudio.currentTime + seconds));
+            const newTime = Math.max(0, Math.min(parentAudio.duration || 0, parentAudio.currentTime + seconds));
+            parentAudio.currentTime = newTime;
+            // Update slider immediately
+            const seek = document.getElementById('acb-seek');
+            if (seek && parentAudio.duration) {
+                seek.value = (newTime / parentAudio.duration) * 100;
+            }
             saveParentAudioState();
         }
 
-        function acbSeek(value) {
-            if (!parentAudio.src || !parentAudio.duration) return;
+        function acbSeekStart() {
+            isSeeking = true;
+        }
+
+        function acbSeekEnd(value) {
+            if (!parentAudio.src || !parentAudio.duration) {
+                isSeeking = false;
+                return;
+            }
             parentAudio.currentTime = (value / 100) * parentAudio.duration;
             saveParentAudioState();
+            isSeeking = false;
+        }
+
+        function acbSeek(value) {
+            // This is called during dragging - just update visual, don't seek yet
+            isSeeking = true;
         }
 
         function notifyIframe(data) {
@@ -4159,7 +4649,8 @@
             const cur = document.getElementById('acb-current');
             const seek = document.getElementById('acb-seek');
             if (cur) cur.textContent = formatTime(parentAudio.currentTime);
-            if (seek && parentAudio.duration) {
+            // Only update slider if user is not actively seeking
+            if (seek && parentAudio.duration && !isSeeking) {
                 seek.value = (parentAudio.currentTime / parentAudio.duration) * 100;
             }
         });
@@ -4169,13 +4660,7 @@
             if (dur) dur.textContent = formatTime(parentAudio.duration);
         });
 
-        parentAudio.addEventListener('ended', () => {
-            updateControlBarUI(null, false);
-            saveParentAudioState();
-            notifyIframe({ type: 'parentAudioEnded' });
-            // Auto-play next song in playlist
-            playNextSong();
-        });
+        // Note: 'ended' event is handled earlier with loop mode logic in playNextSong()
 
         parentAudio.addEventListener('play', () => {
             saveParentAudioState();
