@@ -575,15 +575,22 @@
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
         }
-        .chapter-rect:hover {
-            background: linear-gradient(145deg, rgba(201, 162, 39, 0.4) 0%, rgba(201, 162, 39, 0.25) 100%);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            border-color: rgba(201, 162, 39, 0.4);
+        /* Only apply hover on devices with mouse/trackpad (not touch) */
+        @media (hover: hover) and (pointer: fine) {
+            .chapter-rect:hover {
+                background: linear-gradient(145deg, rgba(201, 162, 39, 0.4) 0%, rgba(201, 162, 39, 0.25) 100%);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                border-color: rgba(201, 162, 39, 0.4);
+            }
+            .chapter-rect:active {
+                transform: translateY(0);
+            }
         }
-        .chapter-rect:active {
-            transform: translateY(0);
+        /* Tap feedback for touch - only via JS-added class */
+        .chapter-rect.tapped {
+            background: linear-gradient(145deg, rgba(201, 162, 39, 0.4) 0%, rgba(201, 162, 39, 0.25) 100%);
         }
         .chapter-rect .ch-num {
             font-size: 1.8em;
@@ -624,15 +631,17 @@
             background: rgba(45, 74, 111, 0.6);
             color: var(--accent);
         }
-        .chapter-set.spotlight .chapter-set-header:hover {
-            background: rgba(45, 74, 111, 0.8);
-        }
         .chapter-set.spotlight .chapter-rect {
             background: linear-gradient(145deg, rgba(201, 162, 39, 0.15) 0%, rgba(201, 162, 39, 0.08) 100%);
             border-color: rgba(201, 162, 39, 0.15);
         }
-        .chapter-set.spotlight .chapter-rect:hover {
-            background: linear-gradient(145deg, rgba(201, 162, 39, 0.4) 0%, rgba(201, 162, 39, 0.25) 100%);
+        @media (hover: hover) and (pointer: fine) {
+            .chapter-set.spotlight .chapter-set-header:hover {
+                background: rgba(45, 74, 111, 0.8);
+            }
+            .chapter-set.spotlight .chapter-rect:hover {
+                background: linear-gradient(145deg, rgba(201, 162, 39, 0.4) 0%, rgba(201, 162, 39, 0.25) 100%);
+            }
         }
         @media (max-width: 600px) {
             .chapter-grid {
@@ -1401,6 +1410,8 @@
 
     <!-- Music Page Overlay -->
     <div class="music-page-overlay" id="musicPageOverlay">
+        <!-- Toast notification for music overlay -->
+        <div id="music-overlay-toast" style="display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 10001; font-size: 0.9em; text-align: center; max-width: 90%;"></div>
         <button class="music-page-close" onclick="toggleMusicPage()" aria-label="Close music page">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
@@ -4598,7 +4609,7 @@
                 }
             }
             // No audio available for this chapter
-            showAudioToast('No content found');
+            showAudioToast('No media found');
         }
 
         function showStillThereModal() {
@@ -4790,6 +4801,11 @@
                 inactivityTimer = null;
             }
         });
+        parentAudio.addEventListener('error', () => {
+            console.log('Audio error - file not found or cannot be played');
+            showAudioToast('No media found');
+            updateControlBarUI(null, false);
+        });
 
         // Listen for messages from iframe
         window.addEventListener('message', (event) => {
@@ -4836,7 +4852,12 @@
         });
 
         function showAudioToast(message) {
-            const toast = document.getElementById('audio-toast');
+            // Use overlay toast if music overlay is visible, otherwise use main toast
+            const overlay = document.getElementById('musicPageOverlay');
+            const isOverlayVisible = overlay && overlay.classList.contains('visible');
+            const toast = isOverlayVisible
+                ? document.getElementById('music-overlay-toast')
+                : document.getElementById('audio-toast');
             if (toast) {
                 toast.textContent = message;
                 toast.style.display = 'block';
