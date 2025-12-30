@@ -174,13 +174,139 @@
             padding: 80px 24px 40px;
             min-height: 100vh;
         }
+        /* Sticky Header */
+        .music-page-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 15px 20px;
+            margin: -80px -24px 20px -24px;
+            padding-top: 80px;
+            background: linear-gradient(to bottom, var(--primary) 0%, var(--primary) 85%, transparent 100%);
+        }
         .music-page-title {
             color: var(--accent);
             font-family: 'Playfair Display', serif;
-            font-size: 2.5em;
-            text-align: center;
-            margin-bottom: 30px;
+            font-size: 1.8em;
+            margin: 0;
+            white-space: nowrap;
         }
+
+        /* Melody Toggle Switch */
+        .melody-toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 25px;
+            flex-shrink: 0;
+        }
+        .melody-label {
+            color: rgba(255,255,255,0.5);
+            font-size: 1em;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            white-space: nowrap;
+        }
+        .melody-label.active {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        .melody-toggle {
+            position: relative;
+            width: 56px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+        .melody-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .melody-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(201, 162, 39, 0.4);
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+        .melody-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--accent);
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        .melody-toggle input:checked + .melody-slider {
+            background-color: rgba(201, 162, 39, 0.6);
+        }
+        .melody-toggle input:checked + .melody-slider:before {
+            transform: translateX(28px);
+        }
+
+        /* Header Action Buttons */
+        .music-header-buttons {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .music-header-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .music-header-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        .music-header-btn:active {
+            transform: scale(0.95);
+        }
+        .music-header-btn .btn-icon {
+            font-size: 0.9em;
+            transition: transform 0.3s ease;
+        }
+        .music-header-btn.expanded .btn-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Happy Face Emoji on Rectangles */
+        .chapter-rect .heard-emoji {
+            position: absolute;
+            top: 2px;
+            right: 3px;
+            font-size: 0.9em;
+            line-height: 1;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+        }
+        .chapter-rect.heard .heard-emoji {
+            opacity: 1;
+            transform: scale(1);
+        }
+
         .music-page-message {
             background: rgba(255,255,255,0.1);
             border-radius: var(--radius-md);
@@ -331,11 +457,60 @@
                 font-size: 1.2em;
                 padding: 12px 16px;
             }
+            .music-page-header {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 12px;
+                padding: 12px 15px;
+                padding-top: 70px;
+                margin: -70px -15px 15px -15px;
+            }
             .music-page-title {
-                font-size: 2.2em;
+                font-size: 1.6em;
+            }
+            .melody-toggle-container {
+                padding: 8px 12px;
+                gap: 8px;
+            }
+            .melody-label {
+                font-size: 0.85em;
+            }
+            .music-header-buttons {
+                gap: 6px;
+            }
+            .music-header-btn {
+                padding: 6px 10px;
+                font-size: 0.8em;
+            }
+            .music-header-btn .btn-text {
+                display: none;
             }
         }
         @media (max-width: 400px) {
+            .music-page-header {
+                gap: 10px;
+            }
+            .music-page-title {
+                font-size: 1.4em;
+            }
+            .melody-toggle-container {
+                padding: 6px 10px;
+                gap: 6px;
+            }
+            .melody-label {
+                font-size: 0.8em;
+            }
+            .melody-toggle {
+                width: 46px;
+                height: 24px;
+            }
+            .melody-slider:before {
+                height: 18px;
+                width: 18px;
+            }
+            .melody-toggle input:checked + .melody-slider:before {
+                transform: translateX(22px);
+            }
             .chapter-grid {
                 grid-template-columns: repeat(3, 1fr);
             }
@@ -1001,7 +1176,33 @@
             </svg>
         </button>
         <div class="music-page-content">
-            <h1 class="music-page-title">Bible Songs</h1>
+            <!-- Sticky Header with Title and Toggle -->
+            <div class="music-page-header">
+                <h1 class="music-page-title">Bible Songs</h1>
+
+                <!-- Melody Toggle Switch -->
+                <div class="melody-toggle-container">
+                    <span class="melody-label melody-label-left active" id="commonLabel">Common</span>
+                    <label class="melody-toggle">
+                        <input type="checkbox" id="melodyToggle" onchange="toggleMelodyType()">
+                        <span class="melody-slider"></span>
+                    </label>
+                    <span class="melody-label melody-label-right" id="uniqueLabel">Unique</span>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="music-header-buttons">
+                    <button class="music-header-btn" onclick="toggleAllSets()" id="toggleAllSetsBtn" title="Minimize/Expand All">
+                        <span class="btn-icon">▼</span>
+                        <span class="btn-text">Minimize</span>
+                    </button>
+                    <button class="music-header-btn" onclick="clearListeningHistory()" title="Clear History">
+                        <span class="btn-icon">✕</span>
+                        <span class="btn-text">Clear History</span>
+                    </button>
+                </div>
+            </div>
+
             <div class="chapter-sets-container" id="chapterSetsContainer">
                 <!-- Chapter sets will be generated by JavaScript -->
             </div>
@@ -3314,12 +3515,33 @@
                     titleSpan.className = 'ch-title';
                     titleSpan.textContent = title;
 
+                    // Add happy face emoji (hidden by default, shown when heard)
+                    const heardEmoji = document.createElement('span');
+                    heardEmoji.className = 'heard-emoji';
+                    heardEmoji.textContent = '😊';
+
                     rect.appendChild(numSpan);
                     rect.appendChild(titleSpan);
+                    rect.appendChild(heardEmoji);
 
                     // Get the href from the sidebar link and store as data attribute
                     const href = chapter.getAttribute('href');
                     rect.setAttribute('data-href', href);
+
+                    // Extract and store chapter name for tracking
+                    let rectChapterName;
+                    if (href.includes('?chapter=')) {
+                        const urlParams = new URLSearchParams(href.split('?')[1]);
+                        rectChapterName = urlParams.get('chapter');
+                    } else {
+                        rectChapterName = href.replace('.html', '');
+                    }
+                    rect.setAttribute('data-chapter', rectChapterName);
+
+                    // Check if this chapter has been heard (from localStorage)
+                    if (isChapterHeard(rectChapterName)) {
+                        rect.classList.add('heard');
+                    }
 
                     // Store the full title for tooltip
                     rect.title = chapterText;
@@ -3517,6 +3739,80 @@
                 toggleSidebar();
             }
         }
+
+        // ===== Listening History Functions =====
+        const HEARD_STORAGE_KEY = 'bibleSongsHeardChapters';
+
+        // Check if a chapter has been heard (15+ seconds)
+        function isChapterHeard(chapterName) {
+            try {
+                const heard = JSON.parse(localStorage.getItem(HEARD_STORAGE_KEY) || '[]');
+                return heard.includes(chapterName);
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // Mark a chapter as heard and update UI
+        function markChapterAsHeard(chapterName) {
+            try {
+                const heard = JSON.parse(localStorage.getItem(HEARD_STORAGE_KEY) || '[]');
+                if (!heard.includes(chapterName)) {
+                    heard.push(chapterName);
+                    localStorage.setItem(HEARD_STORAGE_KEY, JSON.stringify(heard));
+
+                    // Update UI - add heard class to matching rectangles
+                    document.querySelectorAll('.chapter-rect').forEach(rect => {
+                        if (rect.getAttribute('data-chapter') === chapterName) {
+                            rect.classList.add('heard');
+                        }
+                    });
+                    console.log('Marked as heard:', chapterName);
+                }
+            } catch (e) {
+                console.log('Error saving heard status:', e);
+            }
+        }
+
+        // Clear all listening history
+        function clearListeningHistory() {
+            try {
+                localStorage.removeItem(HEARD_STORAGE_KEY);
+                // Remove heard class from all rectangles
+                document.querySelectorAll('.chapter-rect.heard').forEach(rect => {
+                    rect.classList.remove('heard');
+                });
+                showAudioToast('Listening history cleared');
+            } catch (e) {
+                console.log('Error clearing history:', e);
+            }
+        }
+
+        // Toggle all chapter sets (minimize/expand)
+        let allSetsMinimized = false;
+        function toggleAllSets() {
+            const sets = document.querySelectorAll('.chapter-set');
+            const btn = document.getElementById('toggleAllSetsBtn');
+
+            allSetsMinimized = !allSetsMinimized;
+
+            sets.forEach(set => {
+                if (allSetsMinimized) {
+                    set.classList.add('collapsed');
+                } else {
+                    set.classList.remove('collapsed');
+                }
+            });
+
+            // Update button appearance
+            if (allSetsMinimized) {
+                btn.classList.add('expanded');
+                btn.querySelector('.btn-text').textContent = 'Expand';
+            } else {
+                btn.classList.remove('expanded');
+                btn.querySelector('.btn-text').textContent = 'Minimize';
+            }
+        }
     </script>
 
     <!-- iOS Safari scroll spacer for control bar accessibility -->
@@ -3563,6 +3859,25 @@
         let currentAudioTitle = '';
         let sortedPlaylist = []; // Sorted list of all audio files for auto-play
         let cachedAudiolinks = null; // Pre-cached audiolinks for synchronous access
+        let melodyType = 0; // 0 = Common Melody, 1 = Unique Melody
+
+        // Toggle between Common and Unique melody
+        function toggleMelodyType() {
+            const toggle = document.getElementById('melodyToggle');
+            const commonLabel = document.getElementById('commonLabel');
+            const uniqueLabel = document.getElementById('uniqueLabel');
+
+            if (toggle.checked) {
+                melodyType = 1; // Unique
+                commonLabel.classList.remove('active');
+                uniqueLabel.classList.add('active');
+            } else {
+                melodyType = 0; // Common
+                commonLabel.classList.add('active');
+                uniqueLabel.classList.remove('active');
+            }
+            console.log('Melody type changed to:', melodyType === 0 ? 'Common' : 'Unique');
+        }
 
         // Pre-load audiolinks.json for instant access on rectangle clicks
         // This is critical for iOS Safari which requires synchronous user gesture -> audio.play()
@@ -3580,6 +3895,21 @@
         const INACTIVITY_TIMEOUT = 60 * 60 * 1000; // 1 hour in milliseconds
         let inactivityTimer = null;
         let lastActivityTime = Date.now();
+
+        // Listening time tracking for happy face emoji
+        const HEARD_THRESHOLD = 15; // seconds before marking as heard
+        let currentPlayingChapter = null;
+        let currentChapterMarkedHeard = false;
+
+        // Track listening time and mark as heard after 15 seconds
+        parentAudio.addEventListener('timeupdate', function() {
+            if (currentPlayingChapter && !currentChapterMarkedHeard) {
+                if (parentAudio.currentTime >= HEARD_THRESHOLD) {
+                    markChapterAsHeard(currentPlayingChapter);
+                    currentChapterMarkedHeard = true;
+                }
+            }
+        });
 
         function resetInactivityTimer() {
             lastActivityTime = Date.now();
@@ -3614,11 +3944,17 @@
 
             if (audioFiles && audioFiles !== 'sample-audio-file.wav sample-audio-file.wav') {
                 const files = audioFiles.split(' ');
-                const audioFile = files[0]; // Use first file (Common Melody)
+                // Use melodyType: 0 = Common (first file), 1 = Unique (second file)
+                const audioFile = files[melodyType] || files[0]; // Fallback to Common if Unique not available
+                const melodyName = melodyType === 0 ? 'Common' : 'Unique';
 
                 if (audioFile && audioFile !== 'sample-audio-file.wav') {
                     const audioPath = 'music/' + audioFile;
-                    const title = chapterName.replace(/-/g, ' ') + ' (Common)';
+                    const title = chapterName.replace(/-/g, ' ') + ' (' + melodyName + ')';
+
+                    // Track current chapter for "heard" detection
+                    currentPlayingChapter = chapterName;
+                    currentChapterMarkedHeard = isChapterHeard(chapterName); // Don't re-mark if already heard
 
                     // CRITICAL: Set src and play SYNCHRONOUSLY from user gesture
                     // No await/fetch between click and play() for iOS Safari
