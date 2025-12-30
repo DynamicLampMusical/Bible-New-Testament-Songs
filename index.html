@@ -201,24 +201,33 @@
         }
         /* Header minimize button */
         .header-minimize-btn {
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 16px;
+            padding: 6px 12px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 5px;
             cursor: pointer;
             transition: all 0.3s ease;
             color: white;
-            font-size: 0.8em;
+            font-size: 0.75em;
+            font-weight: 500;
         }
         .header-minimize-btn:hover {
-            background: rgba(255,255,255,0.25);
+            background: rgba(255,255,255,0.3);
         }
         .header-minimize-btn .minimize-icon {
             transition: transform 0.3s ease;
+            font-size: 0.9em;
+        }
+        .header-minimize-btn .minimize-text-hide,
+        .header-minimize-btn .minimize-text-show {
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .header-minimize-btn .minimize-text-show {
+            display: none;
         }
         /* Minimized header state */
         .music-page-header.minimized {
@@ -232,6 +241,12 @@
         }
         .music-page-header.minimized .header-minimize-btn .minimize-icon {
             transform: rotate(180deg);
+        }
+        .music-page-header.minimized .header-minimize-btn .minimize-text-hide {
+            display: none;
+        }
+        .music-page-header.minimized .header-minimize-btn .minimize-text-show {
+            display: inline;
         }
         .header-controls-row {
             display: flex;
@@ -1399,6 +1414,8 @@
                     <h1 class="music-page-title">Bible Songs</h1>
                     <button class="header-minimize-btn" onclick="toggleHeaderMinimize()" id="headerMinBtn" title="Minimize header">
                         <span class="minimize-icon">▲</span>
+                        <span class="minimize-text-hide">Hide</span>
+                        <span class="minimize-text-show">More</span>
                     </button>
                 </div>
 
@@ -3718,11 +3735,11 @@
             }
         }
 
-        // Touch tracking for scroll vs tap detection on mobile
-        let touchStartY = 0;
-        let touchStartX = 0;
-        let touchStartTime = 0;
-        const TOUCH_MOVE_THRESHOLD = 10; // pixels - movement beyond this is a scroll
+        // Touch tracking for scroll vs tap detection on mobile (for rectangles)
+        let rectTouchStartY = 0;
+        let rectTouchStartX = 0;
+        let rectTouchStartTime = 0;
+        const RECT_TOUCH_THRESHOLD = 10; // pixels - movement beyond this is a scroll
 
         // Generate chapter sets grid from sidebar (single source of truth)
         function generateChapterSets() {
@@ -3863,20 +3880,20 @@
                     // Touch start - record position for scroll detection
                     rect.addEventListener('touchstart', (e) => {
                         const touch = e.touches[0];
-                        touchStartY = touch.clientY;
-                        touchStartX = touch.clientX;
-                        touchStartTime = Date.now();
+                        rectTouchStartY = touch.clientY;
+                        rectTouchStartX = touch.clientX;
+                        rectTouchStartTime = Date.now();
                     }, { passive: true });
 
                     // Touch end - only activate if it wasn't a scroll
                     rect.addEventListener('touchend', (e) => {
                         const touch = e.changedTouches[0];
-                        const deltaY = Math.abs(touch.clientY - touchStartY);
-                        const deltaX = Math.abs(touch.clientX - touchStartX);
-                        const deltaTime = Date.now() - touchStartTime;
+                        const deltaY = Math.abs(touch.clientY - rectTouchStartY);
+                        const deltaX = Math.abs(touch.clientX - rectTouchStartX);
+                        const deltaTime = Date.now() - rectTouchStartTime;
 
                         // If finger moved less than threshold and was a quick tap, it's a tap not scroll
-                        if (deltaY < TOUCH_MOVE_THRESHOLD && deltaX < TOUCH_MOVE_THRESHOLD && deltaTime < 500) {
+                        if (deltaY < RECT_TOUCH_THRESHOLD && deltaX < RECT_TOUCH_THRESHOLD && deltaTime < 500) {
                             e.preventDefault();
                             activateRect(rect);
                         }
