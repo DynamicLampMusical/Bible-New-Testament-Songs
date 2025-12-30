@@ -1445,7 +1445,7 @@
                 <div class="undo-toast" id="undoToast">
                     <span class="undo-message">History cleared</span>
                     <button class="undo-btn" onclick="undoClearHistory()">↩️ Undo</button>
-                    <span class="undo-timer" id="undoTimer">10</span>
+                    <span class="undo-timer" id="undoTimer">9</span>
                     <button class="undo-cancel-btn" onclick="cancelUndo()">✕</button>
                 </div>
             </div>
@@ -3718,6 +3718,12 @@
             }
         }
 
+        // Touch tracking for scroll vs tap detection on mobile
+        let touchStartY = 0;
+        let touchStartX = 0;
+        let touchStartTime = 0;
+        const TOUCH_MOVE_THRESHOLD = 10; // pixels - movement beyond this is a scroll
+
         // Generate chapter sets grid from sidebar (single source of truth)
         function generateChapterSets() {
             const container = document.getElementById('chapterSetsContainer');
@@ -3814,10 +3820,8 @@
                     // Store the full title for tooltip
                     rect.title = chapterText;
 
-                    rect.onclick = (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-
+                    // Handler function for activating a rectangle
+                    const activateRect = (rect) => {
                         // Get chapter name from data attribute (pre-computed, no parsing needed)
                         const chapterName = rect.getAttribute('data-chapter');
                         if (!chapterName) return;
@@ -3854,8 +3858,37 @@
 
                         // Update URL to reflect current chapter
                         window.history.pushState({}, '', 'index.html?chapter=' + chapterName);
+                    };
 
-                        // Overlay stays open
+                    // Touch start - record position for scroll detection
+                    rect.addEventListener('touchstart', (e) => {
+                        const touch = e.touches[0];
+                        touchStartY = touch.clientY;
+                        touchStartX = touch.clientX;
+                        touchStartTime = Date.now();
+                    }, { passive: true });
+
+                    // Touch end - only activate if it wasn't a scroll
+                    rect.addEventListener('touchend', (e) => {
+                        const touch = e.changedTouches[0];
+                        const deltaY = Math.abs(touch.clientY - touchStartY);
+                        const deltaX = Math.abs(touch.clientX - touchStartX);
+                        const deltaTime = Date.now() - touchStartTime;
+
+                        // If finger moved less than threshold and was a quick tap, it's a tap not scroll
+                        if (deltaY < TOUCH_MOVE_THRESHOLD && deltaX < TOUCH_MOVE_THRESHOLD && deltaTime < 500) {
+                            e.preventDefault();
+                            activateRect(rect);
+                        }
+                    });
+
+                    // Click handler for desktop (mouse) - won't fire on touch devices after touchend preventDefault
+                    rect.onclick = (e) => {
+                        // Only handle if not a touch event (desktop click)
+                        if (e.pointerType === 'touch' || e.sourceCapabilities?.firesTouchEvents) return;
+                        e.preventDefault();
+                        e.stopPropagation();
+                        activateRect(rect);
                     };
 
                     grid.appendChild(rect);
@@ -4048,7 +4081,7 @@
                 // Show undo toast with countdown
                 const toast = document.getElementById('undoToast');
                 const timerEl = document.getElementById('undoTimer');
-                let countdown = 10;
+                let countdown = 9;
 
                 toast.classList.add('visible');
                 timerEl.textContent = countdown;
@@ -4066,12 +4099,12 @@
                     }
                 }, 1000);
 
-                // Auto-hide after 10 seconds
+                // Auto-hide after 9 seconds
                 undoTimer = setTimeout(() => {
                     toast.classList.remove('visible');
                     undoBackup = null;
                     clearInterval(undoCountdown);
-                }, 10000);
+                }, 9000);
 
             } catch (e) {
                 console.log('Error clearing history:', e);
@@ -4548,7 +4581,7 @@
                 }
             }
             // No audio available for this chapter
-            showAudioToast('Audio not available for this chapter');
+            showAudioToast('No content found');
         }
 
         function showStillThereModal() {
