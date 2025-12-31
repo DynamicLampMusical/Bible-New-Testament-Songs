@@ -319,15 +319,23 @@
             margin-right: 2px;
         }
         .melody-label {
-            color: rgba(255,255,255,0.5);
             font-size: 1em;
             font-weight: 500;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
             white-space: nowrap;
+            opacity: 0.5;
         }
         .melody-label.active {
-            color: var(--accent);
             font-weight: 700;
+            opacity: 1;
+        }
+        /* Common label - coral color to match progress ring */
+        .melody-label-left {
+            color: #f97316;
+        }
+        /* Unique label - cyan color to match progress ring */
+        .melody-label-right {
+            color: #06b6d4;
         }
         .melody-toggle {
             position: relative;
@@ -347,10 +355,10 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(201, 162, 39, 0.35);
+            background-color: rgba(249, 115, 22, 0.25);
             transition: 0.3s;
             border-radius: 28px;
-            border: 2px solid rgba(201, 162, 39, 0.5);
+            border: 2px solid rgba(249, 115, 22, 0.5);
         }
         .melody-slider:before {
             position: absolute;
@@ -359,16 +367,19 @@
             width: 20px;
             left: 2px;
             bottom: 2px;
-            background: linear-gradient(135deg, #c9a227 0%, #e8c547 100%);
+            background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
             transition: 0.3s;
             border-radius: 50%;
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
+        /* Unique selected - cyan */
         .melody-toggle input:checked + .melody-slider {
-            background-color: rgba(201, 162, 39, 0.5);
+            background-color: rgba(6, 182, 212, 0.25);
+            border-color: rgba(6, 182, 212, 0.5);
         }
         .melody-toggle input:checked + .melody-slider:before {
             transform: translateX(24px);
+            background: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);
         }
 
         /* Header Action Buttons */
@@ -525,30 +536,78 @@
             background: rgba(255,255,255,0.4);
         }
 
-        /* Happy Face Emojis on Rectangles - Left for Common, Right for Unique */
-        .chapter-rect .heard-emoji-common,
-        .chapter-rect .heard-emoji-unique {
+        /* Progress Ring around Chapter Number */
+        .ch-num-ring {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: transparent;
+            margin-bottom: 2px;
+        }
+        .ch-num-ring::before {
+            content: '';
             position: absolute;
-            top: 1px;
-            font-size: 0.55em;
-            line-height: 1;
-            opacity: 0;
-            transform: scale(0);
-            transition: all 0.3s ease;
+            inset: 0;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.15);
+            transition: all 0.4s ease;
         }
-        .chapter-rect .heard-emoji-common {
-            left: 2px;
+        /* Left half (Common) - coral */
+        .chapter-rect.heard-common .ch-num-ring::before {
+            border-left-color: #f97316;
+            border-bottom-color: #f97316;
         }
-        .chapter-rect .heard-emoji-unique {
-            right: 2px;
+        /* Right half (Unique) - cyan */
+        .chapter-rect.heard-unique .ch-num-ring::before {
+            border-right-color: #06b6d4;
+            border-top-color: #06b6d4;
         }
-        .chapter-rect.heard-common .heard-emoji-common {
-            opacity: 1;
-            transform: scale(1);
+        /* Both heard - full ring gradient effect */
+        .chapter-rect.heard-common.heard-unique .ch-num-ring::before {
+            border-color: transparent;
+            background: conic-gradient(#f97316 0deg, #f97316 180deg, #06b6d4 180deg, #06b6d4 360deg);
+            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff calc(100% - 3px));
+            mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff calc(100% - 3px));
         }
-        .chapter-rect.heard-unique .heard-emoji-unique {
-            opacity: 1;
-            transform: scale(1);
+
+        /* Sound Wave Animation for Currently Playing */
+        .sound-wave {
+            position: absolute;
+            top: 3px;
+            right: 4px;
+            display: none;
+            align-items: flex-end;
+            gap: 2px;
+            height: 14px;
+        }
+        .chapter-rect.playing .sound-wave {
+            display: flex;
+        }
+        .sound-wave .bar {
+            width: 3px;
+            background: #4ade80;
+            border-radius: 2px;
+            animation: soundWave 0.8s ease-in-out infinite;
+        }
+        .sound-wave .bar:nth-child(1) {
+            height: 40%;
+            animation-delay: 0s;
+        }
+        .sound-wave .bar:nth-child(2) {
+            height: 80%;
+            animation-delay: 0.2s;
+        }
+        .sound-wave .bar:nth-child(3) {
+            height: 60%;
+            animation-delay: 0.4s;
+        }
+        @keyframes soundWave {
+            0%, 100% { transform: scaleY(0.5); }
+            50% { transform: scaleY(1); }
         }
 
         .music-page-message {
@@ -672,12 +731,6 @@
             border-color: var(--accent);
             box-shadow: 0 0 10px rgba(201, 162, 39, 0.4);
         }
-        .chapter-rect.playing .ch-num::after {
-            content: ' ✓';
-            font-size: 0.7em;
-            color: #4ade80;
-            font-weight: bold;
-        }
         .chapter-rect {
             position: relative;
         }
@@ -714,12 +767,15 @@
             .chapter-rect .ch-title {
                 font-size: 0.85em;
             }
-            .chapter-rect.playing .ch-num::after {
-                font-size: 0.8em;
+            .ch-num-ring {
+                width: 42px;
+                height: 42px;
             }
-            .chapter-rect .heard-emoji-common,
-            .chapter-rect .heard-emoji-unique {
-                font-size: 0.7em;
+            .sound-wave {
+                height: 16px;
+            }
+            .sound-wave .bar {
+                width: 4px;
             }
             .chapter-set-header {
                 font-size: 1em;
@@ -4019,29 +4075,28 @@
                     // Extract title - remove the (XXX) prefix and chapter number like "1. "
                     let title = chapterText.replace(/\(\d+\)\s*/, '').replace(/^\d+\.\s*/, '').trim();
 
-                    // Create number and title elements
+                    // Create progress ring wrapper for chapter number
+                    const numRing = document.createElement('div');
+                    numRing.className = 'ch-num-ring';
+
                     const numSpan = document.createElement('span');
                     numSpan.className = 'ch-num';
                     numSpan.textContent = displayNum;
+
+                    numRing.appendChild(numSpan);
 
                     const titleSpan = document.createElement('span');
                     titleSpan.className = 'ch-title';
                     titleSpan.textContent = title;
 
-                    // Add happy face emojis (hidden by default, shown when heard)
-                    // Left emoji for Common melody, Right emoji for Unique melody
-                    const heardEmojiCommon = document.createElement('span');
-                    heardEmojiCommon.className = 'heard-emoji-common';
-                    heardEmojiCommon.textContent = '😊';
+                    // Add sound wave animation (hidden by default, shown when playing)
+                    const soundWave = document.createElement('div');
+                    soundWave.className = 'sound-wave';
+                    soundWave.innerHTML = '<div class="bar"></div><div class="bar"></div><div class="bar"></div>';
 
-                    const heardEmojiUnique = document.createElement('span');
-                    heardEmojiUnique.className = 'heard-emoji-unique';
-                    heardEmojiUnique.textContent = '😊';
-
-                    rect.appendChild(numSpan);
+                    rect.appendChild(numRing);
                     rect.appendChild(titleSpan);
-                    rect.appendChild(heardEmojiCommon);
-                    rect.appendChild(heardEmojiUnique);
+                    rect.appendChild(soundWave);
 
                     // Get the href from the sidebar link and store as data attribute
                     const href = chapter.getAttribute('href');
