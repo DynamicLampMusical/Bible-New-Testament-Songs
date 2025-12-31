@@ -466,7 +466,7 @@
             background: linear-gradient(135deg, rgba(60, 160, 60, 0.95) 0%, rgba(40, 130, 40, 0.95) 100%);
             border-radius: 35px;
             box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
-            z-index: 10000;
+            z-index: 99999;
             animation: floatUp 0.3s ease;
         }
         .undo-toast.visible {
@@ -525,18 +525,28 @@
             background: rgba(255,255,255,0.4);
         }
 
-        /* Happy Face Emoji on Rectangles */
-        .chapter-rect .heard-emoji {
+        /* Happy Face Emojis on Rectangles - Left for Common, Right for Unique */
+        .chapter-rect .heard-emoji-common,
+        .chapter-rect .heard-emoji-unique {
             position: absolute;
             top: 1px;
-            left: 2px;
             font-size: 0.55em;
             line-height: 1;
             opacity: 0;
             transform: scale(0);
             transition: all 0.3s ease;
         }
-        .chapter-rect.heard .heard-emoji {
+        .chapter-rect .heard-emoji-common {
+            left: 2px;
+        }
+        .chapter-rect .heard-emoji-unique {
+            right: 2px;
+        }
+        .chapter-rect.heard-common .heard-emoji-common {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .chapter-rect.heard-unique .heard-emoji-unique {
             opacity: 1;
             transform: scale(1);
         }
@@ -662,12 +672,9 @@
             border-color: var(--accent);
             box-shadow: 0 0 10px rgba(201, 162, 39, 0.4);
         }
-        .chapter-rect.playing::after {
-            content: '✓';
-            position: absolute;
-            top: 3px;
-            right: 4px;
-            font-size: 0.85em;
+        .chapter-rect.playing .ch-num::after {
+            content: ' ✓';
+            font-size: 0.7em;
             color: #4ade80;
             font-weight: bold;
         }
@@ -707,12 +714,11 @@
             .chapter-rect .ch-title {
                 font-size: 0.85em;
             }
-            .chapter-rect.playing::after {
-                font-size: 1em;
-                top: 4px;
-                right: 5px;
+            .chapter-rect.playing .ch-num::after {
+                font-size: 0.8em;
             }
-            .chapter-rect .heard-emoji {
+            .chapter-rect .heard-emoji-common,
+            .chapter-rect .heard-emoji-unique {
                 font-size: 0.7em;
             }
             .chapter-set-header {
@@ -1542,8 +1548,6 @@
 
     <!-- Music Page Overlay -->
     <div class="music-page-overlay" id="musicPageOverlay">
-        <!-- Toast notification for music overlay -->
-        <div id="music-overlay-toast" style="display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 10001; font-size: 0.9em; text-align: center; max-width: 90%;"></div>
         <div class="music-page-content">
             <!-- Sticky Header with Title and Controls -->
             <div class="music-page-header" id="musicPageHeader">
@@ -2452,11 +2456,7 @@
                 <p style="margin: 0 0 15px 0; font-size: 0.85em; color: #555; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">New Testament Books (260 Chapters):</p>
 
                 <!-- Toast notification for table clicks -->
-                <div id="table-toast" style="display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6f 100%); color: white; padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 9999; font-size: 0.9em; text-align: center; max-width: 90%; animation: fadeInOut 2.5s ease-in-out;">
-                    Use the menu on the top left to access individual chapters
-                </div>
-                <!-- Toast notification for audio resume -->
-                <div id="audio-toast" style="display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 9999; font-size: 0.9em; text-align: center; max-width: 90%;"></div>
+                <div id="table-toast" style="display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6f 100%); color: white; padding: 12px 40px 12px 24px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 99999; font-size: 0.9em; text-align: center; max-width: 90%; animation: fadeInOut 2.5s ease-in-out;"><span class="toast-message">Use the menu on the top left to access individual chapters</span><span class="toast-close" onclick="this.parentElement.style.display='none'" style="position: absolute; top: 5px; right: 10px; cursor: pointer; font-size: 1.2em; font-weight: bold; opacity: 0.8;">&times;</span></div>
                 <style>
                     @keyframes fadeInOut {
                         0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
@@ -3640,7 +3640,7 @@
                         if (chapter) {
                             const chapterFile = chapter + '.html';
 
-                            // Show chapter in iframe
+                            // Show chapter in iframe (no auto-play - user can use Listen button in chapter)
                             chapterFrame.style.display = 'block';
                             mainContent.style.display = 'none';
                             chapterIframe.src = chapterFile;
@@ -3689,7 +3689,7 @@
                     if (chapter) {
                         const chapterFile = chapter + '.html';
 
-                        // Show chapter in iframe
+                        // Show chapter in iframe (no auto-play - user can use Listen button in chapter)
                         chapterFrame.style.display = 'block';
                         mainContent.style.display = 'none';
                         chapterIframe.src = chapterFile;
@@ -3893,32 +3893,62 @@
         });
 
         // Mark a rectangle as currently playing
-        function markRectanglePlaying(chapterName) {
+        function markRectanglePlaying(chapterName, specificRect) {
             // Remove playing class from all rectangles
             document.querySelectorAll('.chapter-rect.playing').forEach(r => r.classList.remove('playing'));
 
-            // Find and mark the matching rectangle
-            const allRects = document.querySelectorAll('.chapter-rect');
-            allRects.forEach(rect => {
-                const href = rect.getAttribute('data-href') || rect.getAttribute('href') || '';
-                if (href.includes(chapterName)) {
-                    rect.classList.add('playing');
-                    // Scroll the rectangle into view if music page is open
-                    const musicOverlay = document.getElementById('musicPageOverlay');
-                    if (musicOverlay && musicOverlay.classList.contains('visible')) {
-                        rect.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
+            // If a specific rectangle was provided, mark only that one
+            if (specificRect) {
+                specificRect.classList.add('playing');
+                // Scroll the rectangle into view if music page is open
+                const musicOverlay = document.getElementById('musicPageOverlay');
+                if (musicOverlay && musicOverlay.classList.contains('visible')) {
+                    specificRect.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
-            });
+                return;
+            }
+
+            // Fallback: Find and mark by chapter name (for backward compatibility)
+            if (chapterName) {
+                const allRects = document.querySelectorAll('.chapter-rect');
+                allRects.forEach(rect => {
+                    const href = rect.getAttribute('data-href') || rect.getAttribute('href') || '';
+                    if (href.includes(chapterName)) {
+                        rect.classList.add('playing');
+                        // Scroll the rectangle into view if music page is open
+                        const musicOverlay = document.getElementById('musicPageOverlay');
+                        if (musicOverlay && musicOverlay.classList.contains('visible')) {
+                            rect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+                });
+            }
+        }
+
+        // Find a rectangle by chapter name (returns first match)
+        function findRectangleByChapter(chapterName) {
+            const allRects = document.querySelectorAll('.chapter-rect');
+            for (const rect of allRects) {
+                if (rect.getAttribute('data-chapter') === chapterName) {
+                    return rect;
+                }
+            }
+            return null;
         }
 
         // Update rectangle highlight based on current audio
         function updateRectangleFromAudio() {
+            // Use the stored clicked rectangle if available
+            if (currentPlayingRect) {
+                markRectanglePlaying(null, currentPlayingRect);
+                return;
+            }
+
+            // Fallback: Extract chapter name from audio file path (for backward compatibility)
             const audioPlayer = document.getElementById('parent-audio-player');
             const currentSrc = audioPlayer ? audioPlayer.src : '';
             if (!currentSrc.includes('music/')) return;
 
-            // Extract chapter name from audio file path
             // e.g., "music/Chapter-001-Matthew-01_v1-[...].mp3" -> "Chapter-001-Matthew-01"
             const audioFile = currentSrc.split('music/').pop();
             const chapterMatch = audioFile.match(/^(Chapter-\d+-[^_]+|Spotlight-\d+-[^_]+)/);
@@ -3998,14 +4028,20 @@
                     titleSpan.className = 'ch-title';
                     titleSpan.textContent = title;
 
-                    // Add happy face emoji (hidden by default, shown when heard)
-                    const heardEmoji = document.createElement('span');
-                    heardEmoji.className = 'heard-emoji';
-                    heardEmoji.textContent = '😊';
+                    // Add happy face emojis (hidden by default, shown when heard)
+                    // Left emoji for Common melody, Right emoji for Unique melody
+                    const heardEmojiCommon = document.createElement('span');
+                    heardEmojiCommon.className = 'heard-emoji-common';
+                    heardEmojiCommon.textContent = '😊';
+
+                    const heardEmojiUnique = document.createElement('span');
+                    heardEmojiUnique.className = 'heard-emoji-unique';
+                    heardEmojiUnique.textContent = '😊';
 
                     rect.appendChild(numSpan);
                     rect.appendChild(titleSpan);
-                    rect.appendChild(heardEmoji);
+                    rect.appendChild(heardEmojiCommon);
+                    rect.appendChild(heardEmojiUnique);
 
                     // Get the href from the sidebar link and store as data attribute
                     const href = chapter.getAttribute('href');
@@ -4022,8 +4058,12 @@
                     rect.setAttribute('data-chapter', rectChapterName);
 
                     // Check if this chapter has been heard (from localStorage)
-                    if (isChapterHeard(rectChapterName)) {
-                        rect.classList.add('heard');
+                    // Check both Common and Unique melody states
+                    if (isChapterHeard(rectChapterName, 'common')) {
+                        rect.classList.add('heard-common');
+                    }
+                    if (isChapterHeard(rectChapterName, 'unique')) {
+                        rect.classList.add('heard-unique');
                     }
 
                     // Store the full title for tooltip
@@ -4035,6 +4075,9 @@
                         const chapterName = rect.getAttribute('data-chapter');
                         if (!chapterName) return;
 
+                        // Store reference to the clicked rectangle BEFORE playing audio
+                        currentPlayingRect = rect;
+
                         // CRITICAL: Play audio IMMEDIATELY - first thing after user gesture
                         // iOS Safari requires minimal code between click and audio.play()
                         if (window.playChapterAudio) {
@@ -4042,7 +4085,8 @@
                         }
 
                         // Everything else happens after play() starts
-                        markRectanglePlaying(chapterName);
+                        // Mark only the clicked rectangle as playing (not by chapter name)
+                        markRectanglePlaying(null, rect);
 
                         // Load chapter in iframe (in background, after audio starts)
                         const chapterFrame = document.getElementById('chapterFrame');
@@ -4239,30 +4283,43 @@
         const HEARD_STORAGE_KEY = 'bibleSongsHeardChapters';
 
         // Check if a chapter has been heard (15+ seconds)
-        function isChapterHeard(chapterName) {
+        // melodyType: 'common' or 'unique'
+        function isChapterHeard(chapterName, melodyTypeStr) {
             try {
-                const heard = JSON.parse(localStorage.getItem(HEARD_STORAGE_KEY) || '[]');
-                return heard.includes(chapterName);
+                const heard = JSON.parse(localStorage.getItem(HEARD_STORAGE_KEY) || '{"common":[],"unique":[]}');
+                // Handle legacy format (array) - migrate to new format
+                if (Array.isArray(heard)) {
+                    return heard.includes(chapterName);
+                }
+                const list = heard[melodyTypeStr] || [];
+                return list.includes(chapterName);
             } catch (e) {
                 return false;
             }
         }
 
         // Mark a chapter as heard and update UI
+        // Uses current melodyType (0 = common, 1 = unique)
         function markChapterAsHeard(chapterName) {
             try {
-                const heard = JSON.parse(localStorage.getItem(HEARD_STORAGE_KEY) || '[]');
-                if (!heard.includes(chapterName)) {
-                    heard.push(chapterName);
-                    localStorage.setItem(HEARD_STORAGE_KEY, JSON.stringify(heard));
+                let heard = JSON.parse(localStorage.getItem(HEARD_STORAGE_KEY) || '{"common":[],"unique":[]}');
+                // Handle legacy format (array) - migrate to new format
+                if (Array.isArray(heard)) {
+                    heard = { common: heard, unique: [] };
+                }
 
-                    // Update UI - add heard class to matching rectangles
-                    document.querySelectorAll('.chapter-rect').forEach(rect => {
-                        if (rect.getAttribute('data-chapter') === chapterName) {
-                            rect.classList.add('heard');
-                        }
-                    });
-                    console.log('Marked as heard:', chapterName);
+                const melodyTypeStr = melodyType === 0 ? 'common' : 'unique';
+                if (!heard[melodyTypeStr]) heard[melodyTypeStr] = [];
+
+                if (!heard[melodyTypeStr].includes(chapterName)) {
+                    heard[melodyTypeStr].push(chapterName);
+                    localStorage.setItem(HEARD_STORAGE_KEY, JSON.stringify(heard));
+                    console.log('Marked as heard:', chapterName, '(' + melodyTypeStr + ')');
+                }
+
+                // Update UI - add heard class only to the specific clicked rectangle
+                if (currentPlayingRect) {
+                    currentPlayingRect.classList.add('heard-' + melodyTypeStr);
                 }
             } catch (e) {
                 console.log('Error saving heard status:', e);
@@ -4282,9 +4339,9 @@
                 // Clear the history
                 localStorage.removeItem(HEARD_STORAGE_KEY);
 
-                // Remove heard class from all rectangles
-                document.querySelectorAll('.chapter-rect.heard').forEach(rect => {
-                    rect.classList.remove('heard');
+                // Remove heard classes from all rectangles
+                document.querySelectorAll('.chapter-rect').forEach(rect => {
+                    rect.classList.remove('heard-common', 'heard-unique');
                 });
 
                 // Show undo toast with countdown
@@ -4327,11 +4384,18 @@
                     localStorage.setItem(HEARD_STORAGE_KEY, undoBackup);
 
                     // Restore heard class on rectangles
-                    const heard = JSON.parse(undoBackup);
+                    let heard = JSON.parse(undoBackup);
+                    // Handle legacy format (array)
+                    if (Array.isArray(heard)) {
+                        heard = { common: heard, unique: [] };
+                    }
                     document.querySelectorAll('.chapter-rect').forEach(rect => {
                         const chapterName = rect.getAttribute('data-chapter');
-                        if (heard.includes(chapterName)) {
-                            rect.classList.add('heard');
+                        if (heard.common && heard.common.includes(chapterName)) {
+                            rect.classList.add('heard-common');
+                        }
+                        if (heard.unique && heard.unique.includes(chapterName)) {
+                            rect.classList.add('heard-unique');
                         }
                     });
 
@@ -4680,8 +4744,11 @@
                     if (playlistIndex >= 0 && playlistChapters.length > 0) {
                         const nextIndex = (playlistIndex + 1) % playlistChapters.length;
                         const nextChapter = playlistChapters[nextIndex];
+                        // Find and store the next rectangle
+                        const nextRect = findRectangleByChapter(nextChapter);
+                        if (nextRect) currentPlayingRect = nextRect;
                         window.playChapterAudio(nextChapter);
-                        markRectanglePlaying(nextChapter);
+                        markRectanglePlaying(null, nextRect);
                         updateChapterPageAndSidebar(nextChapter);
                     }
                     break;
@@ -4693,8 +4760,11 @@
                     if (allIndex >= 0 && allChapters.length > 0) {
                         const nextIndex = (allIndex + 1) % allChapters.length;
                         const nextChapter = allChapters[nextIndex];
+                        // Find and store the next rectangle
+                        const nextRectAll = findRectangleByChapter(nextChapter);
+                        if (nextRectAll) currentPlayingRect = nextRectAll;
                         window.playChapterAudio(nextChapter);
-                        markRectanglePlaying(nextChapter);
+                        markRectanglePlaying(null, nextRectAll);
                         updateChapterPageAndSidebar(nextChapter);
                     }
                     break;
@@ -4712,8 +4782,11 @@
                         } else {
                             randomChapter = randomChapters[0];
                         }
+                        // Find and store the next rectangle
+                        const nextRectRandom = findRectangleByChapter(randomChapter);
+                        if (nextRectRandom) currentPlayingRect = nextRectRandom;
                         window.playChapterAudio(randomChapter);
-                        markRectanglePlaying(randomChapter);
+                        markRectanglePlaying(null, nextRectRandom);
                         updateChapterPageAndSidebar(randomChapter);
                     }
                     break;
@@ -4746,6 +4819,7 @@
         const HEARD_THRESHOLD = 15; // seconds before marking as heard
         let currentPlayingChapter = null;
         let currentChapterMarkedHeard = false;
+        let currentPlayingRect = null; // Track the specific clicked rectangle
 
         // Track listening time and mark as heard after 15 seconds
         parentAudio.addEventListener('timeupdate', function() {
@@ -5067,6 +5141,11 @@
                         audioPath: parentAudio.src || ''
                     });
                     break;
+
+                case 'showToast':
+                    // Iframe is requesting to show a toast in the parent window
+                    showAudioToast(data.message);
+                    break;
             }
         });
 
@@ -5078,9 +5157,31 @@
                 ? document.getElementById('music-overlay-toast')
                 : document.getElementById('audio-toast');
             if (toast) {
-                toast.textContent = message;
+                const msgSpan = toast.querySelector('.toast-message');
+                if (msgSpan) {
+                    msgSpan.textContent = message;
+                } else {
+                    toast.textContent = message;
+                }
+
+                // Detect if keyboard is open (viewport height significantly smaller than window height)
+                const isKeyboardOpen = window.visualViewport
+                    ? window.visualViewport.height < window.innerHeight * 0.75
+                    : document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA');
+
+                // Position at top if keyboard is open, otherwise bottom (150px to clear audio control bar)
+                if (isKeyboardOpen) {
+                    toast.style.top = '20px';
+                    toast.style.bottom = 'auto';
+                } else {
+                    toast.style.top = 'auto';
+                    toast.style.bottom = '150px';
+                }
+
                 toast.style.display = 'block';
-                setTimeout(() => { toast.style.display = 'none'; }, 3000);
+                // Clear any existing timeout
+                if (toast.hideTimeout) clearTimeout(toast.hideTimeout);
+                toast.hideTimeout = setTimeout(() => { toast.style.display = 'none'; }, 3000);
             }
         }
 
@@ -5144,5 +5245,9 @@
 
         window.addEventListener('beforeunload', saveParentAudioState);
     </script>
+
+    <!-- Toasts placed at body level to stay fixed above all content -->
+    <div id="music-overlay-toast" style="display: none; position: fixed; bottom: 150px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 12px 40px 12px 24px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 99999; font-size: 0.9em; text-align: center; max-width: 90%;"><span class="toast-message"></span><span class="toast-close" onclick="this.parentElement.style.display='none'" style="position: absolute; top: 5px; right: 10px; cursor: pointer; font-size: 1.2em; font-weight: bold; opacity: 0.8;">&times;</span></div>
+    <div id="audio-toast" style="display: none; position: fixed; bottom: 150px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 12px 40px 12px 24px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 99999; font-size: 0.9em; text-align: center; max-width: 90%;"><span class="toast-message"></span><span class="toast-close" onclick="this.parentElement.style.display='none'" style="position: absolute; top: 5px; right: 10px; cursor: pointer; font-size: 1.2em; font-weight: bold; opacity: 0.8;">&times;</span></div>
 </body>
 </html>
